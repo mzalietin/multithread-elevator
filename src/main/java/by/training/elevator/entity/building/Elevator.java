@@ -1,9 +1,11 @@
 package by.training.elevator.entity.building;
 
 import by.training.elevator.entity.passenger.Passenger;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeSet;
 
 public class Elevator {
     private final Building building;
@@ -17,7 +19,7 @@ public class Elevator {
         } else {
             throw new IllegalArgumentException("Elevator capacity cannot be negative");
         }
-        container = new HashSet<>(capacity, 1.0f);
+        container = new TreeSet<>(Comparator.comparingInt(Passenger::getDestinationLevel));
     }
 
     public Building getBuilding() {

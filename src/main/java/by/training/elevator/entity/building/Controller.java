@@ -11,23 +11,20 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-/**
- * Elevator operator implementation for managing multithreaded transportation of passengers.
- */
 public class Controller {
     private final Elevator elevator;
 
     private static final Logger logger = LogManager.getRootLogger();
-    private final AtomicInteger ignorePassengersCount = new AtomicInteger();
     private final Set<Integer> emptyDispatches = new HashSet<>();
     private final int levelsCount;
+    private final int minLevel;
+    private final int maxLevel;
 
     private final Lock lock = new ReentrantLock(true);
     private final Condition[] elevatorArrived;
@@ -35,12 +32,6 @@ public class Controller {
     private Level currentLevel;
     private boolean directionUp;
 
-    /**
-     * Single constructor which performs vital initials, specifically creates condition object instance for each level
-     * and for transportation finish. Checks input argument for negative value.
-     *
-     * @param levelsCount configuration parameter of levels count.
-     */
     public Controller(int levelsCount, Elevator elevator) {
         if (levelsCount > 0) {
             this.elevatorArrived = new Condition[levelsCount];
@@ -48,6 +39,8 @@ public class Controller {
                 this.elevatorArrived[i] = lock.newCondition();
             }
             this.levelsCount = levelsCount;
+            this.minLevel = 0;
+            this.maxLevel = levelsCount - 1;
             this.elevator = Objects.requireNonNull(elevator);
             this.currentLevel = elevator.getBuilding().getLevels().get(0);
             this.directionUp = true;
@@ -56,51 +49,22 @@ public class Controller {
         }
     }
 
-    /**
-     * Acquires operator's monitor.
-     */
     public void acquireLock() {
         lock.lock();
     }
 
-    /**
-     * Releases operator's monitor.
-     */
     public void releaseLock() {
         lock.unlock();
     }
 
-    /**
-     * Simple getter for test purposes.
-     *
-     * @return level value.
-     */
     public int getCurrentLevel() {
         return currentLevel.getValue();
     }
 
-    /**
-     * Simple getter for test purposes.
-     *
-     * @return elevator
-     */
     public Elevator getElevator() {
         return elevator;
     }
 
-    /**
-     * Checks if current dispatch is empty or passengers can be ignored due to direction discrepancy.
-     *
-     * @return boolean
-     */
-    private boolean noRemainingPassengers() {
-        return currentLevel.getDispatchContainer().size() == ignorePassengersCount.get();
-    }
-
-    /**
-     * Method to launch transportation process. Creates transportation tasks for each passenger, then starts operartor's
-     * workflow thread and tasks threadpool.
-     */
     public void startTransportation() {
         try {
             List<Passenger> passengers = elevator.getBuilding().allPassengers();
@@ -109,10 +73,10 @@ public class Controller {
 
             passengers.forEach(pas -> threadPool.submit(new TransportationTask(pas, this)));
 
-            Work controllerExecution = new Work();
+            Worker controllerWorker = new Worker();
 
-            controllerExecution.start();
-            controllerExecution.join();
+            controllerWorker.start();
+            controllerWorker.join();
 
             threadPool.shutdown();
         } catch (InterruptedException e) {
@@ -120,44 +84,29 @@ public class Controller {
         }
     }
 
-    /**
-     * Moves elevator to the next level according to its current direction.
-     */
     private void moveElevator() {
         int nextLevel;
 
         if (directionUp) {
             nextLevel = currentLevel.getValue() + 1;
-            if (nextLevel == levelsCount - 1) {
-                directionUp = false;
-            }
         } else {
             nextLevel = currentLevel.getValue() - 1;
-            if (nextLevel == 0) {
-                directionUp = true;
-            }
         }
 
-        logger.info(MessageConstants.MOVING_ELEVATOR, currentLevel.getValue(), nextLevel);
+        logger.info(MessageConstants.MOVING_ELEVATOR, directionUp ? "UP" : "DOWN", currentLevel.getValue(), nextLevel);
         currentLevel = elevator.getBuilding().getLevels().get(nextLevel);
+
+        if (currentLevel.getValue() == maxLevel) {
+            directionUp = false;
+        } else if (currentLevel.getValue() == minLevel) {
+            directionUp = true;
+        }
     }
 
-    /**
-     * Notifies passengers that elevator arrived to the new level and people that wait in this level's dispatch to be
-     * transported.
-     */
     private void notifyNewLevel() {
         elevatorArrived[currentLevel.getValue()].signalAll();
     }
 
-    /**
-     * Guarantees that passenger will be accepted to elevators cab if and only if: elevator is arrived to the level in
-     * which dispatch he is waiting on; passengers transportation direction is similar to the current direction of elevator;
-     * elevator's cabine is not full. Also, if elevator has arrived to passengers initial level, but their directions doesn't
-     * match, passenger is added to ignore counter.
-     *
-     * @param passenger passenger that should await his boarding to elevator.
-     */
     public void awaitBoarding(Passenger passenger) {
         try {
             do {
@@ -169,21 +118,10 @@ public class Controller {
     }
 
     private boolean directionsMatch(Passenger passenger) {
-        if (passenger.isDestinationUpward() == directionUp) {
-            return true;
-        } else {
-            ignorePassengersCount.incrementAndGet();
-            return false;
-        }
+        return passenger.isDestinationUpward() == directionUp;
     }
 
-    /**
-     * Boards specified passenger to elevator. If current level dispatch is empty, increments corresponding counter.
-     *
-     * @param passenger passenger to be embarked to elevators cab.
-     */
     public void boardPassenger(Passenger passenger) {
-        Objects.requireNonNull(passenger);
         logger.info(MessageConstants.BOARDING_OF_PASSENGER, passenger.getId(), currentLevel.getValue());
         currentLevel.getDispatchContainer().remove(passenger);
         elevator.boardPassenger(passenger);
@@ -193,13 +131,7 @@ public class Controller {
         }
     }
 
-    /**
-     * Orders transportation task to wait until specified passenger isn't transported.
-     *
-     * @param passenger passenger expecting to be transported.
-     */
     public void awaitTransportation(Passenger passenger) {
-        Objects.requireNonNull(passenger);
         try {
             elevatorArrived[passenger.getDestinationLevel()].await();
         } catch (InterruptedException e) {
@@ -207,28 +139,14 @@ public class Controller {
         }
     }
 
-    /**
-     * Removes passenger from elevator when he is transported to his destination level.
-     *
-     * @param passenger passenger to deboard from elevator.
-     */
     public void unboardPassenger(Passenger passenger) {
-        Objects.requireNonNull(passenger);
         logger.info(MessageConstants.UNBOARDING_OF_PASSENGER, passenger.getId(), currentLevel.getValue());
         elevator.unboardPassenger(passenger);
         currentLevel.getArrivalContainer().add(passenger);
     }
 
-    /**
-     * Represents controller workflow.
-     */
-    private class Work extends Thread {
+    private class Worker extends Thread {
 
-        /**
-         * Thread will not stop until count of empty dispatches will not be equal to levels count and elevator
-         * container is not emty. Next cycle of elevator move performs when it's container is full or when all
-         * passengers left in dispatch are in transportation ignore.
-         */
         @Override
         public void run() {
             logger.info(MessageConstants.STARTING_TRANSPORTATION);
@@ -243,27 +161,25 @@ public class Controller {
             } finally {
                 lock.unlock();
             }
-            while (emptyDispatches.size() != levelsCount || !elevator.isEmpty()) {
-                if (elevator.isFull() || noRemainingPassengers()) {
-                    try {
-                        lock.lock();
-                        moveElevator();
-                        ignorePassengersCount.set(0);
-                        notifyNewLevel();
-                    } finally {
-                        lock.unlock();
+            while (true) {
+                try {
+                    lock.lock();
+                    if (emptyDispatches.size() == levelsCount && elevator.isEmpty()) {
+                        break;
                     }
+                    moveElevator();
+                    notifyNewLevel();
+                } finally {
+                    lock.unlock();
                 }
             }
+
             logger.info(MessageConstants.TRANSPORTATION_COMPLETE);
         }
     }
 
-    /**
-     * Validates transportation process finish via java asserts.
-     */
     public void validateFinish() {
-        logger.info("VALIDATION PROCESS");
+        logger.info("------ VALIDATION PROCESS ------");
 
         int arrivedPassengersCount = 0;
 
