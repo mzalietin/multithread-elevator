@@ -6,7 +6,7 @@ public class Passenger {
     private final int destinationLevel;
     private TransportationState state;
 
-    Passenger(int id, int initialLevel, int destinationLevel) {
+    public Passenger(int id, int initialLevel, int destinationLevel) {
         this.id = id;
         this.initialLevel = initialLevel;
         this.destinationLevel = destinationLevel;

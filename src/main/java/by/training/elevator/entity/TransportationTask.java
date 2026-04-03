@@ -2,25 +2,20 @@ package by.training.elevator.entity;
 
 import by.training.elevator.entity.building.Controller;
 import by.training.elevator.entity.passenger.Passenger;
-
-import java.util.Objects;
-import java.util.concurrent.Callable;
-
 import by.training.elevator.entity.passenger.TransportationState;
+import java.util.Objects;
 
-public class TransportationTask implements Callable<Void> {
+public class TransportationTask implements Runnable {
     private final Passenger passenger;
     private final Controller controller;
 
     public TransportationTask(Passenger passenger, Controller controller) {
         this.passenger = Objects.requireNonNull(passenger);
         this.controller = Objects.requireNonNull(controller);
-
-        passenger.setState(TransportationState.IN_PROGRESS);
     }
 
     @Override
-    public Void call() {
+    public void run() {
         try {
             controller.acquireLock();
             controller.awaitBoarding(passenger);
@@ -31,6 +26,5 @@ public class TransportationTask implements Callable<Void> {
             controller.releaseLock();
         }
         passenger.setState(TransportationState.COMPLETED);
-        return null;
     }
 }

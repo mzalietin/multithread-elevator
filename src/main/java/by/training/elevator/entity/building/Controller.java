@@ -5,7 +5,6 @@ import by.training.elevator.conf.MessageConstants;
 import by.training.elevator.entity.TransportationTask;
 import by.training.elevator.entity.passenger.Passenger;
 import by.training.elevator.entity.passenger.TransportationState;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -32,7 +31,6 @@ public class Controller {
 
     private final Lock lock = new ReentrantLock(true);
     private final Condition[] elevatorArrived;
-    private final Condition elevatorMoved; //todo can be replaced?
 
     private Level currentLevel;
     private boolean directionUp;
@@ -49,14 +47,13 @@ public class Controller {
             for (int i = 0; i < levelsCount; i++) {
                 this.elevatorArrived[i] = lock.newCondition();
             }
-            this.elevatorMoved = lock.newCondition();
             this.levelsCount = levelsCount;
+            this.elevator = Objects.requireNonNull(elevator);
+            this.currentLevel = elevator.getBuilding().getLevels().get(0);
+            this.directionUp = true;
         } else {
             throw new IllegalArgumentException("Levels count cannot be negative/zero");
         }
-        this.elevator = Objects.requireNonNull(elevator);
-        this.currentLevel = elevator.getBuilding().getLevels().get(0);
-        this.directionUp = true;
     }
 
     /**
@@ -92,12 +89,11 @@ public class Controller {
     }
 
     /**
-     * Checks if remaining passengers count in current level's dispatch container is equal to passengers count, that
-     * will not be transported from current level because of direction discrepancy with elevator's direction.
+     * Checks if current dispatch is empty or passengers can be ignored due to direction discrepancy.
      *
-     * @return true if all passengers in dispatch are ignored.
+     * @return boolean
      */
-    private boolean remainingPassengersInIgnore() {
+    private boolean noRemainingPassengers() {
         return currentLevel.getDispatchContainer().size() == ignorePassengersCount.get();
     }
 
@@ -106,88 +102,21 @@ public class Controller {
      * workflow thread and tasks threadpool.
      */
     public void startTransportation() {
-        List<TransportationTask> taskList = new ArrayList<>();
-        for (Level st: elevator.getBuilding().getLevels()) {
-            for (Passenger pas: st.getDispatchContainer()) {
-                taskList.add(new TransportationTask(pas, this));
-            }
-        }
-
         try {
-            ExecutorService controllerExecutor = Executors.newSingleThreadScheduledExecutor();
-            controllerExecutor.submit(new Work());
+            List<Passenger> passengers = elevator.getBuilding().allPassengers();
 
-            ExecutorService threadPool = Executors.newFixedThreadPool(taskList.size());
-            threadPool.invokeAll(taskList);
+            ExecutorService threadPool = Executors.newFixedThreadPool(passengers.size());
+
+            passengers.forEach(pas -> threadPool.submit(new TransportationTask(pas, this)));
+
+            Work controllerExecution = new Work();
+
+            controllerExecution.start();
+            controllerExecution.join();
 
             threadPool.shutdown();
-            controllerExecutor.shutdown();
         } catch (InterruptedException e) {
             logger.catching(e);
-        }
-    }
-
-    /**
-     * Validates transportation process finish via java asserts.
-     */
-    public void validateFinish() {
-        logger.info("VALIDATION PROCESS");
-
-        int arrivedPassengersCount = 0;
-
-        for (Level st: elevator.getBuilding().getLevels()) {
-            logger.info("Level {} dispatch is empty - {}", st.getValue(), st.getDispatchContainer().isEmpty());
-            assert st.getDispatchContainer().isEmpty();
-
-            arrivedPassengersCount += st.getArrivalContainer().size();
-
-            for (Passenger pas: st.getArrivalContainer()) {
-                logger.info("Passenger #{} with destination {} is in level {} arrival", pas.getId(), pas.getDestinationLevel(), st.getValue());
-                assert pas.getDestinationLevel() == st.getValue();
-
-                logger.info("Passenger #{} state {}", pas.getId(), pas.getState());
-                assert pas.getState() == TransportationState.COMPLETED;
-            }
-        }
-
-        logger.info("Arrived passenger count - {}, initial passenger count - {}", arrivedPassengersCount, Configuration.PASSENGERS_NUMBER);
-        assert arrivedPassengersCount == Configuration.PASSENGERS_NUMBER;
-    }
-
-    /**
-     * Represents controller workflow.
-     */
-    private class Work extends Thread {
-
-        /**
-         * Thread will not stop until count of empty dispatches will not be equal to levels count and elevator
-         * container is not emty. Next cycle of elevator move performs when it's container is full or when all
-         * passengers left in dispatch are in transportation ignore.
-         */
-        @Override
-        public void run() {
-            logger.info(MessageConstants.STARTING_TRANSPORTATION);
-
-            while (emptyDispatches.size() != levelsCount || !elevator.isEmpty()) {
-                if (elevator.isFull() || remainingPassengersInIgnore()) {
-                    try {
-                        lock.lock();
-
-                        moveElevator();
-
-                        if (currentLevel.getDispatchContainer().isEmpty()) {
-                            emptyDispatches.add(currentLevel.getValue());
-                        }
-                        ignorePassengersCount.set(0);
-
-                        notifyNewLevel();
-                    }  finally {
-                        lock.unlock();
-                    }
-                }
-            }
-
-            logger.info(MessageConstants.TRANSPORTATION_COMPLETE);
         }
     }
 
@@ -218,7 +147,6 @@ public class Controller {
      * transported.
      */
     private void notifyNewLevel() {
-        elevatorMoved.signalAll();
         elevatorArrived[currentLevel.getValue()].signalAll();
     }
 
@@ -231,20 +159,21 @@ public class Controller {
      * @param passenger passenger that should await his boarding to elevator.
      */
     public void awaitBoarding(Passenger passenger) {
-        Objects.requireNonNull(passenger);
         try {
-            while (passenger.getInitialLevel() != currentLevel.getValue()
-                    || passenger.isDestinationUpward() != directionUp
-                    || elevator.isFull()) {
-
-                if (passenger.getInitialLevel() == currentLevel.getValue() && passenger.isDestinationUpward() != directionUp) {
-                    ignorePassengersCount.incrementAndGet();
-                }
-
+            do {
                 elevatorArrived[passenger.getInitialLevel()].await();
-            }
+            } while (!directionsMatch(passenger) || elevator.isFull());
         } catch (InterruptedException e) {
             logger.catching(e);
+        }
+    }
+
+    private boolean directionsMatch(Passenger passenger) {
+        if (passenger.isDestinationUpward() == directionUp) {
+            return true;
+        } else {
+            ignorePassengersCount.incrementAndGet();
+            return false;
         }
     }
 
@@ -258,6 +187,7 @@ public class Controller {
         logger.info(MessageConstants.BOARDING_OF_PASSENGER, passenger.getId(), currentLevel.getValue());
         currentLevel.getDispatchContainer().remove(passenger);
         elevator.boardPassenger(passenger);
+        passenger.setState(TransportationState.IN_PROGRESS);
         if (currentLevel.getDispatchContainer().isEmpty()) {
             emptyDispatches.add(currentLevel.getValue());
         }
@@ -271,9 +201,7 @@ public class Controller {
     public void awaitTransportation(Passenger passenger) {
         Objects.requireNonNull(passenger);
         try {
-            while (passenger.getDestinationLevel() != currentLevel.getValue()) {
-                elevatorMoved.await();
-            }
+            elevatorArrived[passenger.getDestinationLevel()].await();
         } catch (InterruptedException e) {
             logger.catching(e);
         }
@@ -289,5 +217,73 @@ public class Controller {
         logger.info(MessageConstants.UNBOARDING_OF_PASSENGER, passenger.getId(), currentLevel.getValue());
         elevator.unboardPassenger(passenger);
         currentLevel.getArrivalContainer().add(passenger);
+    }
+
+    /**
+     * Represents controller workflow.
+     */
+    private class Work extends Thread {
+
+        /**
+         * Thread will not stop until count of empty dispatches will not be equal to levels count and elevator
+         * container is not emty. Next cycle of elevator move performs when it's container is full or when all
+         * passengers left in dispatch are in transportation ignore.
+         */
+        @Override
+        public void run() {
+            logger.info(MessageConstants.STARTING_TRANSPORTATION);
+            // save levels with empty dispatches beforehand
+            elevator.getBuilding().getLevels().stream()
+                    .filter(level -> level.getDispatchContainer().isEmpty())
+                    .forEach(level -> emptyDispatches.add(level.getValue()));
+            // initial signal
+            try {
+                lock.lock();
+                elevatorArrived[0].signalAll();
+            } finally {
+                lock.unlock();
+            }
+            while (emptyDispatches.size() != levelsCount || !elevator.isEmpty()) {
+                if (elevator.isFull() || noRemainingPassengers()) {
+                    try {
+                        lock.lock();
+                        moveElevator();
+                        ignorePassengersCount.set(0);
+                        notifyNewLevel();
+                    } finally {
+                        lock.unlock();
+                    }
+                }
+            }
+            logger.info(MessageConstants.TRANSPORTATION_COMPLETE);
+        }
+    }
+
+    /**
+     * Validates transportation process finish via java asserts.
+     */
+    public void validateFinish() {
+        logger.info("VALIDATION PROCESS");
+
+        int arrivedPassengersCount = 0;
+
+        for (Level st : elevator.getBuilding().getLevels()) {
+            logger.info("Level {} dispatch is empty - {}", st.getValue(), st.getDispatchContainer().isEmpty());
+            assert st.getDispatchContainer().isEmpty();
+
+            arrivedPassengersCount += st.getArrivalContainer().size();
+
+            for (Passenger pas : st.getArrivalContainer()) {
+                logger.info("Passenger #{} with destination {} is in level {} arrival", pas.getId(), pas.getDestinationLevel(),
+                        st.getValue());
+                assert pas.getDestinationLevel() == st.getValue();
+
+                logger.info("Passenger #{} state {}", pas.getId(), pas.getState());
+                assert pas.getState() == TransportationState.COMPLETED;
+            }
+        }
+
+        logger.info("Arrived passenger count - {}, initial passenger count - {}", arrivedPassengersCount, Configuration.PASSENGERS_NUMBER);
+        assert arrivedPassengersCount == Configuration.PASSENGERS_NUMBER;
     }
 }

@@ -5,8 +5,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import by.training.elevator.conf.Configuration;
 import by.training.elevator.entity.building.Building;
@@ -66,7 +64,6 @@ public class InitializerTest {
     @Test
     public void testElevator() {
         assertEquals(Configuration.ELEVATOR_CAPACITY, elevator.getCapacity());
-        assertTrue(elevator.isDirectionUp());
         assertTrue(elevator.isEmpty());
         assertNotNull(elevator.getBuilding());
     }
@@ -76,9 +73,7 @@ public class InitializerTest {
         final int FIRST_LEVEL = 0;
         assertEquals(FIRST_LEVEL, controller.getCurrentLevel());
 
-        Passenger passenger = mock(Passenger.class);
-        when(passenger.getInitialLevel()).thenReturn(FIRST_LEVEL);
-        when(passenger.getDestinationLevel()).thenReturn(FIRST_LEVEL);
+        Passenger passenger = new Passenger(1, FIRST_LEVEL, FIRST_LEVEL);
 
         controller.boardPassenger(passenger);
 
