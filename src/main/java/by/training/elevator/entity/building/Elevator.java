@@ -9,7 +9,6 @@ public class Elevator {
     private final Building building;
     private final Set<Passenger> container;
     private final int capacity;
-    private boolean directionUp;
 
     public Elevator(int capacity, Building building) {
         this.building = Objects.requireNonNull(building);
@@ -19,19 +18,10 @@ public class Elevator {
             throw new IllegalArgumentException("Elevator capacity cannot be negative");
         }
         container = new HashSet<>(capacity, 1.0f);
-        directionUp = true;
     }
 
     public Building getBuilding() {
         return building;
-    }
-
-    public void setDirectionUp(boolean directionUp) {
-        this.directionUp = directionUp;
-    }
-
-    public boolean isDirectionUp() {
-        return directionUp;
     }
 
     public int getCapacity() {

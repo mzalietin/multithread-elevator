@@ -1,2 +1,200 @@
-12:32:03.940 INFO   - Passenger #0 picked up at level 0
-12:32:03.943 INFO   - Passenger #0 arrived at level 0
+13:22:21.128 INFO   - Initialized Passenger{id=1, initialLevel=6, destinationLevel=5, state=NOT_STARTED}
+13:22:21.131 INFO   - Initialized Passenger{id=2, initialLevel=5, destinationLevel=4, state=NOT_STARTED}
+13:22:21.131 INFO   - Initialized Passenger{id=3, initialLevel=10, destinationLevel=1, state=NOT_STARTED}
+13:22:21.131 INFO   - Initialized Passenger{id=4, initialLevel=17, destinationLevel=9, state=NOT_STARTED}
+13:22:21.131 INFO   - Initialized Passenger{id=5, initialLevel=4, destinationLevel=11, state=NOT_STARTED}
+13:22:21.131 INFO   - Initialized Passenger{id=6, initialLevel=15, destinationLevel=7, state=NOT_STARTED}
+13:22:21.131 INFO   - Initialized Passenger{id=7, initialLevel=3, destinationLevel=1, state=NOT_STARTED}
+13:22:21.131 INFO   - Initialized Passenger{id=8, initialLevel=19, destinationLevel=12, state=NOT_STARTED}
+13:22:21.131 INFO   - Initialized Passenger{id=9, initialLevel=17, destinationLevel=11, state=NOT_STARTED}
+13:22:21.131 INFO   - Initialized Passenger{id=10, initialLevel=15, destinationLevel=13, state=NOT_STARTED}
+13:22:21.131 INFO   - Initialized Passenger{id=11, initialLevel=11, destinationLevel=9, state=NOT_STARTED}
+13:22:21.132 INFO   - Initialized Passenger{id=12, initialLevel=10, destinationLevel=18, state=NOT_STARTED}
+13:22:21.132 INFO   - Initialized Passenger{id=13, initialLevel=15, destinationLevel=17, state=NOT_STARTED}
+13:22:21.132 INFO   - Initialized Passenger{id=14, initialLevel=12, destinationLevel=11, state=NOT_STARTED}
+13:22:21.132 INFO   - Initialized Passenger{id=15, initialLevel=9, destinationLevel=5, state=NOT_STARTED}
+13:22:21.132 INFO   - Initialized Passenger{id=16, initialLevel=14, destinationLevel=1, state=NOT_STARTED}
+13:22:21.132 INFO   - Initialized Passenger{id=17, initialLevel=5, destinationLevel=17, state=NOT_STARTED}
+13:22:21.132 INFO   - Initialized Passenger{id=18, initialLevel=5, destinationLevel=9, state=NOT_STARTED}
+13:22:21.132 INFO   - Initialized Passenger{id=19, initialLevel=13, destinationLevel=11, state=NOT_STARTED}
+13:22:21.132 INFO   - Initialized Passenger{id=20, initialLevel=2, destinationLevel=12, state=NOT_STARTED}
+13:22:21.137 INFO   - Transportation process started
+13:22:21.137 INFO   - Moving elevator from level 0 to level 1
+13:22:21.137 INFO   - Moving elevator from level 1 to level 2
+13:22:21.137 INFO   - Passenger #20 picked up at level 2
+13:22:21.138 INFO   - Moving elevator from level 2 to level 3
+13:22:21.138 INFO   - Moving elevator from level 3 to level 4
+13:22:21.138 INFO   - Passenger #5 picked up at level 4
+13:22:21.138 INFO   - Moving elevator from level 4 to level 5
+13:22:21.138 INFO   - Passenger #18 picked up at level 5
+13:22:21.139 INFO   - Passenger #17 picked up at level 5
+13:22:21.139 INFO   - Moving elevator from level 5 to level 6
+13:22:21.139 INFO   - Moving elevator from level 6 to level 7
+13:22:21.139 INFO   - Moving elevator from level 7 to level 8
+13:22:21.140 INFO   - Moving elevator from level 8 to level 9
+13:22:21.140 INFO   - Passenger #18 arrived at level 9
+13:22:21.140 INFO   - Moving elevator from level 9 to level 10
+13:22:21.140 INFO   - Passenger #12 picked up at level 10
+13:22:21.140 INFO   - Moving elevator from level 10 to level 11
+13:22:21.141 INFO   - Passenger #5 arrived at level 11
+13:22:21.141 INFO   - Moving elevator from level 11 to level 12
+13:22:21.141 INFO   - Passenger #20 arrived at level 12
+13:22:21.141 INFO   - Moving elevator from level 12 to level 13
+13:22:21.141 INFO   - Moving elevator from level 13 to level 14
+13:22:21.141 INFO   - Moving elevator from level 14 to level 15
+13:22:21.141 INFO   - Passenger #13 picked up at level 15
+13:22:21.142 INFO   - Moving elevator from level 15 to level 16
+13:22:21.142 INFO   - Moving elevator from level 16 to level 17
+13:22:21.142 INFO   - Passenger #17 arrived at level 17
+13:22:21.142 INFO   - Passenger #13 arrived at level 17
+13:22:21.142 INFO   - Moving elevator from level 17 to level 18
+13:22:21.142 INFO   - Passenger #12 arrived at level 18
+13:22:21.142 INFO   - Moving elevator from level 18 to level 19
+13:22:21.142 INFO   - Passenger #8 picked up at level 19
+13:22:21.143 INFO   - Moving elevator from level 19 to level 18
+13:22:21.143 INFO   - Moving elevator from level 18 to level 17
+13:22:21.143 INFO   - Passenger #9 picked up at level 17
+13:22:21.143 INFO   - Passenger #4 picked up at level 17
+13:22:21.144 INFO   - Moving elevator from level 17 to level 16
+13:22:21.144 INFO   - Moving elevator from level 16 to level 15
+13:22:21.144 INFO   - Passenger #10 picked up at level 15
+13:22:21.144 INFO   - Passenger #6 picked up at level 15
+13:22:21.147 INFO   - Moving elevator from level 15 to level 14
+13:22:21.147 INFO   - Moving elevator from level 14 to level 13
+13:22:21.147 INFO   - Passenger #10 arrived at level 13
+13:22:21.147 INFO   - Passenger #19 picked up at level 13
+13:22:21.147 INFO   - Moving elevator from level 13 to level 12
+13:22:21.148 INFO   - Passenger #8 arrived at level 12
+13:22:21.148 INFO   - Passenger #14 picked up at level 12
+13:22:21.148 INFO   - Moving elevator from level 12 to level 11
+13:22:21.148 INFO   - Passenger #9 arrived at level 11
+13:22:21.149 INFO   - Passenger #19 arrived at level 11
+13:22:21.149 INFO   - Passenger #14 arrived at level 11
+13:22:21.149 INFO   - Passenger #11 picked up at level 11
+13:22:21.149 INFO   - Moving elevator from level 11 to level 10
+13:22:21.149 INFO   - Passenger #3 picked up at level 10
+13:22:21.149 INFO   - Moving elevator from level 10 to level 9
+13:22:21.149 INFO   - Passenger #4 arrived at level 9
+13:22:21.150 INFO   - Passenger #11 arrived at level 9
+13:22:21.150 INFO   - Passenger #15 picked up at level 9
+13:22:21.150 INFO   - Moving elevator from level 9 to level 8
+13:22:21.150 INFO   - Moving elevator from level 8 to level 7
+13:22:21.150 INFO   - Passenger #6 arrived at level 7
+13:22:21.150 INFO   - Moving elevator from level 7 to level 6
+13:22:21.150 INFO   - Passenger #1 picked up at level 6
+13:22:21.151 INFO   - Moving elevator from level 6 to level 5
+13:22:21.151 INFO   - Passenger #15 arrived at level 5
+13:22:21.151 INFO   - Passenger #1 arrived at level 5
+13:22:21.151 INFO   - Passenger #2 picked up at level 5
+13:22:21.151 INFO   - Moving elevator from level 5 to level 4
+13:22:21.151 INFO   - Passenger #2 arrived at level 4
+13:22:21.151 INFO   - Moving elevator from level 4 to level 3
+13:22:21.151 INFO   - Passenger #7 picked up at level 3
+13:22:21.151 INFO   - Moving elevator from level 3 to level 2
+13:22:21.153 INFO   - Moving elevator from level 2 to level 1
+13:22:21.153 INFO   - Passenger #3 arrived at level 1
+13:22:21.153 INFO   - Passenger #7 arrived at level 1
+13:22:21.153 INFO   - Moving elevator from level 1 to level 0
+13:22:21.153 INFO   - Moving elevator from level 0 to level 1
+13:22:21.153 INFO   - Moving elevator from level 1 to level 2
+13:22:21.153 INFO   - Moving elevator from level 2 to level 3
+13:22:21.153 INFO   - Moving elevator from level 3 to level 4
+13:22:21.153 INFO   - Moving elevator from level 4 to level 5
+13:22:21.153 INFO   - Moving elevator from level 5 to level 6
+13:22:21.153 INFO   - Moving elevator from level 6 to level 7
+13:22:21.153 INFO   - Moving elevator from level 7 to level 8
+13:22:21.153 INFO   - Moving elevator from level 8 to level 9
+13:22:21.153 INFO   - Moving elevator from level 9 to level 10
+13:22:21.153 INFO   - Moving elevator from level 10 to level 11
+13:22:21.153 INFO   - Moving elevator from level 11 to level 12
+13:22:21.153 INFO   - Moving elevator from level 12 to level 13
+13:22:21.154 INFO   - Moving elevator from level 13 to level 14
+13:22:21.154 INFO   - Moving elevator from level 14 to level 15
+13:22:21.154 INFO   - Moving elevator from level 15 to level 16
+13:22:21.154 INFO   - Moving elevator from level 16 to level 17
+13:22:21.154 INFO   - Moving elevator from level 17 to level 18
+13:22:21.154 INFO   - Moving elevator from level 18 to level 19
+13:22:21.154 INFO   - Moving elevator from level 19 to level 18
+13:22:21.154 INFO   - Moving elevator from level 18 to level 17
+13:22:21.154 INFO   - Moving elevator from level 17 to level 16
+13:22:21.154 INFO   - Moving elevator from level 16 to level 15
+13:22:21.154 INFO   - Moving elevator from level 15 to level 14
+13:22:21.154 INFO   - Passenger #16 picked up at level 14
+13:22:21.155 INFO   - Moving elevator from level 14 to level 13
+13:22:21.155 INFO   - Moving elevator from level 13 to level 12
+13:22:21.155 INFO   - Moving elevator from level 12 to level 11
+13:22:21.155 INFO   - Moving elevator from level 11 to level 10
+13:22:21.155 INFO   - Moving elevator from level 10 to level 9
+13:22:21.155 INFO   - Moving elevator from level 9 to level 8
+13:22:21.155 INFO   - Moving elevator from level 8 to level 7
+13:22:21.156 INFO   - Moving elevator from level 7 to level 6
+13:22:21.156 INFO   - Moving elevator from level 6 to level 5
+13:22:21.156 INFO   - Moving elevator from level 5 to level 4
+13:22:21.156 INFO   - Moving elevator from level 4 to level 3
+13:22:21.156 INFO   - Moving elevator from level 3 to level 2
+13:22:21.156 INFO   - Moving elevator from level 2 to level 1
+13:22:21.156 INFO   - Passenger #16 arrived at level 1
+13:22:21.156 INFO   - Moving elevator from level 1 to level 0
+13:22:21.157 INFO   - Transportation process finished
+13:22:21.157 INFO   - VALIDATION PROCESS
+13:22:21.157 INFO   - Level 0 dispatch is empty - true
+13:22:21.157 INFO   - Level 1 dispatch is empty - true
+13:22:21.157 INFO   - Passenger #16 with destination 1 is in level 1 arrival
+13:22:21.157 INFO   - Passenger #16 state COMPLETED
+13:22:21.157 INFO   - Passenger #7 with destination 1 is in level 1 arrival
+13:22:21.158 INFO   - Passenger #7 state COMPLETED
+13:22:21.158 INFO   - Passenger #3 with destination 1 is in level 1 arrival
+13:22:21.158 INFO   - Passenger #3 state COMPLETED
+13:22:21.158 INFO   - Level 2 dispatch is empty - true
+13:22:21.158 INFO   - Level 3 dispatch is empty - true
+13:22:21.158 INFO   - Level 4 dispatch is empty - true
+13:22:21.158 INFO   - Passenger #2 with destination 4 is in level 4 arrival
+13:22:21.158 INFO   - Passenger #2 state COMPLETED
+13:22:21.158 INFO   - Level 5 dispatch is empty - true
+13:22:21.158 INFO   - Passenger #1 with destination 5 is in level 5 arrival
+13:22:21.158 INFO   - Passenger #1 state COMPLETED
+13:22:21.158 INFO   - Passenger #15 with destination 5 is in level 5 arrival
+13:22:21.158 INFO   - Passenger #15 state COMPLETED
+13:22:21.158 INFO   - Level 6 dispatch is empty - true
+13:22:21.158 INFO   - Level 7 dispatch is empty - true
+13:22:21.158 INFO   - Passenger #6 with destination 7 is in level 7 arrival
+13:22:21.158 INFO   - Passenger #6 state COMPLETED
+13:22:21.158 INFO   - Level 8 dispatch is empty - true
+13:22:21.158 INFO   - Level 9 dispatch is empty - true
+13:22:21.158 INFO   - Passenger #18 with destination 9 is in level 9 arrival
+13:22:21.158 INFO   - Passenger #18 state COMPLETED
+13:22:21.158 INFO   - Passenger #11 with destination 9 is in level 9 arrival
+13:22:21.158 INFO   - Passenger #11 state COMPLETED
+13:22:21.158 INFO   - Passenger #4 with destination 9 is in level 9 arrival
+13:22:21.158 INFO   - Passenger #4 state COMPLETED
+13:22:21.158 INFO   - Level 10 dispatch is empty - true
+13:22:21.159 INFO   - Level 11 dispatch is empty - true
+13:22:21.159 INFO   - Passenger #19 with destination 11 is in level 11 arrival
+13:22:21.159 INFO   - Passenger #19 state COMPLETED
+13:22:21.159 INFO   - Passenger #9 with destination 11 is in level 11 arrival
+13:22:21.159 INFO   - Passenger #9 state COMPLETED
+13:22:21.159 INFO   - Passenger #5 with destination 11 is in level 11 arrival
+13:22:21.159 INFO   - Passenger #5 state COMPLETED
+13:22:21.159 INFO   - Passenger #14 with destination 11 is in level 11 arrival
+13:22:21.159 INFO   - Passenger #14 state COMPLETED
+13:22:21.159 INFO   - Level 12 dispatch is empty - true
+13:22:21.159 INFO   - Passenger #8 with destination 12 is in level 12 arrival
+13:22:21.159 INFO   - Passenger #8 state COMPLETED
+13:22:21.159 INFO   - Passenger #20 with destination 12 is in level 12 arrival
+13:22:21.159 INFO   - Passenger #20 state COMPLETED
+13:22:21.159 INFO   - Level 13 dispatch is empty - true
+13:22:21.159 INFO   - Passenger #10 with destination 13 is in level 13 arrival
+13:22:21.159 INFO   - Passenger #10 state COMPLETED
+13:22:21.159 INFO   - Level 14 dispatch is empty - true
+13:22:21.159 INFO   - Level 15 dispatch is empty - true
+13:22:21.159 INFO   - Level 16 dispatch is empty - true
+13:22:21.159 INFO   - Level 17 dispatch is empty - true
+13:22:21.159 INFO   - Passenger #17 with destination 17 is in level 17 arrival
+13:22:21.159 INFO   - Passenger #17 state COMPLETED
+13:22:21.159 INFO   - Passenger #13 with destination 17 is in level 17 arrival
+13:22:21.159 INFO   - Passenger #13 state COMPLETED
+13:22:21.159 INFO   - Level 18 dispatch is empty - true
+13:22:21.160 INFO   - Passenger #12 with destination 18 is in level 18 arrival
+13:22:21.160 INFO   - Passenger #12 state COMPLETED
+13:22:21.160 INFO   - Level 19 dispatch is empty - true
+13:22:21.160 INFO   - Arrived passenger count - 20, initial passenger count - 20

@@ -9,8 +9,8 @@ import java.util.concurrent.Callable;
 import by.training.elevator.entity.passenger.TransportationState;
 
 public class TransportationTask implements Callable<Void> {
-    private Passenger passenger;
-    private Controller controller;
+    private final Passenger passenger;
+    private final Controller controller;
 
     public TransportationTask(Passenger passenger, Controller controller) {
         this.passenger = Objects.requireNonNull(passenger);

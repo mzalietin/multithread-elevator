@@ -9,8 +9,12 @@ import by.training.elevator.entity.passenger.Passenger;
 import by.training.elevator.entity.passenger.PassengerFactory;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public final class Initializer {
+
+    private static final Logger logger = LogManager.getRootLogger();
 
     public static Controller initSimulation() {
         int levelsCount = Configuration.LEVELS_COUNT;
@@ -24,6 +28,7 @@ public final class Initializer {
         Passenger passenger;
         for (int i = 0; i < Configuration.PASSENGERS_NUMBER; i++) {
             passenger = PassengerFactory.producePassenger();
+            logger.info("Initialized {}", passenger);
             levels.get(passenger.getInitialLevel()).getDispatchContainer().add(passenger);
         }
 

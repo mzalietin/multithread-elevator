@@ -24,15 +24,18 @@ import org.apache.logging.log4j.Logger;
  */
 public class Controller {
     private final Elevator elevator;
-    private Level currentLevel;
 
-    private final Logger logger = LogManager.getRootLogger();
+    private static final Logger logger = LogManager.getRootLogger();
     private final AtomicInteger ignorePassengersCount = new AtomicInteger();
-    private final Set<Integer> emptyDispatch = new HashSet<>();
+    private final Set<Integer> emptyDispatches = new HashSet<>();
+    private final int levelsCount;
 
     private final Lock lock = new ReentrantLock(true);
-    private final Condition[] levelConditions;
-    private final Condition transported;
+    private final Condition[] elevatorArrived;
+    private final Condition elevatorMoved; //todo can be replaced?
+
+    private Level currentLevel;
+    private boolean directionUp;
 
     /**
      * Single constructor which performs vital initials, specifically creates condition object instance for each level
@@ -42,16 +45,18 @@ public class Controller {
      */
     public Controller(int levelsCount, Elevator elevator) {
         if (levelsCount > 0) {
-            this.levelConditions = new Condition[levelsCount];
+            this.elevatorArrived = new Condition[levelsCount];
             for (int i = 0; i < levelsCount; i++) {
-                this.levelConditions[i] = lock.newCondition();
+                this.elevatorArrived[i] = lock.newCondition();
             }
-            this.transported = lock.newCondition();
+            this.elevatorMoved = lock.newCondition();
+            this.levelsCount = levelsCount;
         } else {
-            throw new IllegalArgumentException("Stories count cannot be negative/zero");
+            throw new IllegalArgumentException("Levels count cannot be negative/zero");
         }
         this.elevator = Objects.requireNonNull(elevator);
         this.currentLevel = elevator.getBuilding().getLevels().get(0);
+        this.directionUp = true;
     }
 
     /**
@@ -71,12 +76,17 @@ public class Controller {
     /**
      * Simple getter for test purposes.
      *
-     * @return level value of current story.
+     * @return level value.
      */
     public int getCurrentLevel() {
         return currentLevel.getValue();
     }
 
+    /**
+     * Simple getter for test purposes.
+     *
+     * @return elevator
+     */
     public Elevator getElevator() {
         return elevator;
     }
@@ -132,7 +142,7 @@ public class Controller {
             arrivedPassengersCount += st.getArrivalContainer().size();
 
             for (Passenger pas: st.getArrivalContainer()) {
-                logger.info("Passenger #{} with destination {} is in story {} arrival", pas.getId(), pas.getDestinationLevel(), st.getValue());
+                logger.info("Passenger #{} with destination {} is in level {} arrival", pas.getId(), pas.getDestinationLevel(), st.getValue());
                 assert pas.getDestinationLevel() == st.getValue();
 
                 logger.info("Passenger #{} state {}", pas.getId(), pas.getState());
@@ -158,7 +168,7 @@ public class Controller {
         public void run() {
             logger.info(MessageConstants.STARTING_TRANSPORTATION);
 
-            while (emptyDispatch.size() != levelConditions.length || !elevator.isEmpty()) {
+            while (emptyDispatches.size() != levelsCount || !elevator.isEmpty()) {
                 if (elevator.isFull() || remainingPassengersInIgnore()) {
                     try {
                         lock.lock();
@@ -166,11 +176,11 @@ public class Controller {
                         moveElevator();
 
                         if (currentLevel.getDispatchContainer().isEmpty()) {
-                            emptyDispatch.add(currentLevel.getValue());
+                            emptyDispatches.add(currentLevel.getValue());
                         }
                         ignorePassengersCount.set(0);
 
-                        notifyNewStory();
+                        notifyNewLevel();
                     }  finally {
                         lock.unlock();
                     }
@@ -182,20 +192,20 @@ public class Controller {
     }
 
     /**
-     * Moves elevator to the next story according to it's current direction.
+     * Moves elevator to the next level according to its current direction.
      */
     private void moveElevator() {
         int nextLevel;
 
-        if (elevator.isDirectionUp()) {
+        if (directionUp) {
             nextLevel = currentLevel.getValue() + 1;
-            if (nextLevel == levelConditions.length - 1) {
-                elevator.setDirectionUp(false);
+            if (nextLevel == levelsCount - 1) {
+                directionUp = false;
             }
         } else {
             nextLevel = currentLevel.getValue() - 1;
             if (nextLevel == 0) {
-                elevator.setDirectionUp(true);
+                directionUp = true;
             }
         }
 
@@ -204,19 +214,19 @@ public class Controller {
     }
 
     /**
-     * Notifies passengers that elevator arrived to the new story and people that wait in this story dispatch to be
+     * Notifies passengers that elevator arrived to the new level and people that wait in this level's dispatch to be
      * transported.
      */
-    private void notifyNewStory() {
-        transported.signalAll();
-        levelConditions[currentLevel.getValue()].signalAll();
+    private void notifyNewLevel() {
+        elevatorMoved.signalAll();
+        elevatorArrived[currentLevel.getValue()].signalAll();
     }
 
     /**
-     * Guarantees that passenger will be accepted to elevators cab if and only if: elevator is arrived to the story in
-     * which dispatch he is waiting on; passengers transportation direction is similar to current elevator's direction;
-     * elevators cabine is not full. Also if elevator has arrived to passengers story, but theirs directions doesn't
-     * correlate, passenger signs in ignore counter.
+     * Guarantees that passenger will be accepted to elevators cab if and only if: elevator is arrived to the level in
+     * which dispatch he is waiting on; passengers transportation direction is similar to the current direction of elevator;
+     * elevator's cabine is not full. Also, if elevator has arrived to passengers initial level, but their directions doesn't
+     * match, passenger is added to ignore counter.
      *
      * @param passenger passenger that should await his boarding to elevator.
      */
@@ -224,15 +234,14 @@ public class Controller {
         Objects.requireNonNull(passenger);
         try {
             while (passenger.getInitialLevel() != currentLevel.getValue()
-                    || passenger.isDestinationUpward() != elevator.isDirectionUp()
+                    || passenger.isDestinationUpward() != directionUp
                     || elevator.isFull()) {
 
-                if (passenger.getInitialLevel() == currentLevel.getValue()
-                        && passenger.isDestinationUpward() != elevator.isDirectionUp()) {
+                if (passenger.getInitialLevel() == currentLevel.getValue() && passenger.isDestinationUpward() != directionUp) {
                     ignorePassengersCount.incrementAndGet();
                 }
 
-                levelConditions[passenger.getInitialLevel()].await();
+                elevatorArrived[passenger.getInitialLevel()].await();
             }
         } catch (InterruptedException e) {
             logger.catching(e);
@@ -250,7 +259,7 @@ public class Controller {
         currentLevel.getDispatchContainer().remove(passenger);
         elevator.boardPassenger(passenger);
         if (currentLevel.getDispatchContainer().isEmpty()) {
-            emptyDispatch.add(currentLevel.getValue());
+            emptyDispatches.add(currentLevel.getValue());
         }
     }
 
@@ -263,7 +272,7 @@ public class Controller {
         Objects.requireNonNull(passenger);
         try {
             while (passenger.getDestinationLevel() != currentLevel.getValue()) {
-                transported.await();
+                elevatorMoved.await();
             }
         } catch (InterruptedException e) {
             logger.catching(e);

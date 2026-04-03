@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>by.training</groupId>
-    <artifactId>elevator</artifactId>
+    <artifactId>multithread-elevator</artifactId>
     <version>1.0</version>
 
     <dependencies>

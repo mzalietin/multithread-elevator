@@ -56,4 +56,14 @@ public class Passenger {
         result = 31 * result + destinationLevel;
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "Passenger{" +
+                "id=" + id +
+                ", initialLevel=" + initialLevel +
+                ", destinationLevel=" + destinationLevel +
+                ", state=" + state +
+                '}';
+    }
 }
