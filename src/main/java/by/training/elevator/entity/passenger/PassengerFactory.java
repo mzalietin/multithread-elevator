@@ -7,17 +7,17 @@ public class PassengerFactory {
     private static int idSource = 0;
 
     public static Passenger producePassenger() {
-        int init = generateStory();
-        int dest = generateStory();
+        int init = generateLevel();
+        int dest = generateLevel();
 
         while (dest == init) {
-            dest = generateStory();
+            dest = generateLevel();
         }
 
         return new Passenger(++idSource, init, dest);
     }
 
-    private static int generateStory() {
-        return (int) (Math.random() * Configuration.STOREYS_COUNT);
+    private static int generateLevel() {
+        return (int) (Math.random() * Configuration.LEVELS_COUNT);
     }
 }

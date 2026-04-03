@@ -1,15 +1,15 @@
 package by.training.elevator.entity.passenger;
 
 public class Passenger {
-    private int id;
-    private int initialStory;
-    private int destinationStory;
+    private final int id;
+    private final int initialLevel;
+    private final int destinationLevel;
     private TransportationState state;
 
-    Passenger(int id, int initialStory, int destinationStory) {
+    Passenger(int id, int initialLevel, int destinationLevel) {
         this.id = id;
-        this.initialStory = initialStory;
-        this.destinationStory = destinationStory;
+        this.initialLevel = initialLevel;
+        this.destinationLevel = destinationLevel;
         state = TransportationState.NOT_STARTED;
     }
 
@@ -17,12 +17,12 @@ public class Passenger {
         return id;
     }
 
-    public int getDestinationStory() {
-        return destinationStory;
+    public int getDestinationLevel() {
+        return destinationLevel;
     }
 
-    public int getInitialStory() {
-        return initialStory;
+    public int getInitialLevel() {
+        return initialLevel;
     }
 
     public TransportationState getState() {
@@ -34,7 +34,7 @@ public class Passenger {
     }
 
     public boolean isDestinationUpward() {
-        return destinationStory > initialStory;
+        return destinationLevel > initialLevel;
     }
 
     @Override
@@ -45,15 +45,15 @@ public class Passenger {
         Passenger passenger = (Passenger) o;
 
         if (id != passenger.id) return false;
-        if (initialStory != passenger.initialStory) return false;
-        return destinationStory == passenger.destinationStory;
+        if (initialLevel != passenger.initialLevel) return false;
+        return destinationLevel == passenger.destinationLevel;
     }
 
     @Override
     public int hashCode() {
         int result = id;
-        result = 31 * result + initialStory;
-        result = 31 * result + destinationStory;
+        result = 31 * result + initialLevel;
+        result = 31 * result + destinationLevel;
         return result;
     }
 }

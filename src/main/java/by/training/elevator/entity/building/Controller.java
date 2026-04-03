@@ -5,53 +5,53 @@ import by.training.elevator.conf.MessageConstants;
 import by.training.elevator.entity.TransportationTask;
 import by.training.elevator.entity.passenger.Passenger;
 import by.training.elevator.entity.passenger.TransportationState;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Elevator operator implementation for managing multithreaded transportation of passengers.
  */
 public class Controller {
-    private Elevator elevator;
-    private Storey currentStorey;
+    private final Elevator elevator;
+    private Level currentLevel;
 
     private final Logger logger = LogManager.getRootLogger();
     private final AtomicInteger ignorePassengersCount = new AtomicInteger();
     private final Set<Integer> emptyDispatch = new HashSet<>();
 
     private final Lock lock = new ReentrantLock(true);
-    private final Condition[] storyConditions;
+    private final Condition[] levelConditions;
     private final Condition transported;
 
     /**
-     * Single constructor which performs vital initials, specifically creates condition object instance for each storey
+     * Single constructor which performs vital initials, specifically creates condition object instance for each level
      * and for transportation finish. Checks input argument for negative value.
      *
-     * @param storiesCount configuration parameter of storeys count.
+     * @param levelsCount configuration parameter of levels count.
      */
-    public Controller(int storiesCount) {
-        if (storiesCount > 0) {
-            storyConditions = new Condition[storiesCount];
-            for (int i = 0; i < storiesCount; i++) {
-                storyConditions[i] = lock.newCondition();
+    public Controller(int levelsCount, Elevator elevator) {
+        if (levelsCount > 0) {
+            this.levelConditions = new Condition[levelsCount];
+            for (int i = 0; i < levelsCount; i++) {
+                this.levelConditions[i] = lock.newCondition();
             }
-            transported = lock.newCondition();
+            this.transported = lock.newCondition();
         } else {
             throw new IllegalArgumentException("Stories count cannot be negative/zero");
         }
-    }
-
-    public void setElevator(Elevator elevator) {
         this.elevator = Objects.requireNonNull(elevator);
-        currentStorey = elevator.getBuilding().getStories().get(0);
+        this.currentLevel = elevator.getBuilding().getLevels().get(0);
     }
 
     /**
@@ -73,18 +73,22 @@ public class Controller {
      *
      * @return level value of current story.
      */
-    public int getCurrentStorey() {
-        return currentStorey.getLevel();
+    public int getCurrentLevel() {
+        return currentLevel.getValue();
+    }
+
+    public Elevator getElevator() {
+        return elevator;
     }
 
     /**
-     * Checks if remaining passengers count in current storey's dispatch container is equal to passengers count, that
-     * will not be transported from current storey because of direction discrepancy with elevator's direction.
+     * Checks if remaining passengers count in current level's dispatch container is equal to passengers count, that
+     * will not be transported from current level because of direction discrepancy with elevator's direction.
      *
      * @return true if all passengers in dispatch are ignored.
      */
     private boolean remainingPassengersInIgnore() {
-        return currentStorey.getDispatchContainer().size() == ignorePassengersCount.get();
+        return currentLevel.getDispatchContainer().size() == ignorePassengersCount.get();
     }
 
     /**
@@ -93,7 +97,7 @@ public class Controller {
      */
     public void startTransportation() {
         List<TransportationTask> taskList = new ArrayList<>();
-        for (Storey st: elevator.getBuilding().getStories()) {
+        for (Level st: elevator.getBuilding().getLevels()) {
             for (Passenger pas: st.getDispatchContainer()) {
                 taskList.add(new TransportationTask(pas, this));
             }
@@ -121,15 +125,15 @@ public class Controller {
 
         int arrivedPassengersCount = 0;
 
-        for (Storey st: elevator.getBuilding().getStories()) {
-            logger.info("Storey {} dispatch is empty - {}", st.getLevel(), st.getDispatchContainer().isEmpty());
+        for (Level st: elevator.getBuilding().getLevels()) {
+            logger.info("Level {} dispatch is empty - {}", st.getValue(), st.getDispatchContainer().isEmpty());
             assert st.getDispatchContainer().isEmpty();
 
             arrivedPassengersCount += st.getArrivalContainer().size();
 
             for (Passenger pas: st.getArrivalContainer()) {
-                logger.info("Passenger #{} with destination {} is in story {} arrival", pas.getId(), pas.getDestinationStory(), st.getLevel());
-                assert pas.getDestinationStory() == st.getLevel();
+                logger.info("Passenger #{} with destination {} is in story {} arrival", pas.getId(), pas.getDestinationLevel(), st.getValue());
+                assert pas.getDestinationLevel() == st.getValue();
 
                 logger.info("Passenger #{} state {}", pas.getId(), pas.getState());
                 assert pas.getState() == TransportationState.COMPLETED;
@@ -146,7 +150,7 @@ public class Controller {
     private class Work extends Thread {
 
         /**
-         * Thread will not stop until count of empty dispatches will not be equal to storeys count and elevator
+         * Thread will not stop until count of empty dispatches will not be equal to levels count and elevator
          * container is not emty. Next cycle of elevator move performs when it's container is full or when all
          * passengers left in dispatch are in transportation ignore.
          */
@@ -154,15 +158,15 @@ public class Controller {
         public void run() {
             logger.info(MessageConstants.STARTING_TRANSPORTATION);
 
-            while (emptyDispatch.size() != storyConditions.length || !elevator.isEmpty()) {
+            while (emptyDispatch.size() != levelConditions.length || !elevator.isEmpty()) {
                 if (elevator.isFull() || remainingPassengersInIgnore()) {
                     try {
                         lock.lock();
 
                         moveElevator();
 
-                        if (currentStorey.getDispatchContainer().isEmpty()) {
-                            emptyDispatch.add(currentStorey.getLevel());
+                        if (currentLevel.getDispatchContainer().isEmpty()) {
+                            emptyDispatch.add(currentLevel.getValue());
                         }
                         ignorePassengersCount.set(0);
 
@@ -184,19 +188,19 @@ public class Controller {
         int nextLevel;
 
         if (elevator.isDirectionUp()) {
-            nextLevel = currentStorey.getLevel() + 1;
-            if (nextLevel == storyConditions.length - 1) {
+            nextLevel = currentLevel.getValue() + 1;
+            if (nextLevel == levelConditions.length - 1) {
                 elevator.setDirectionUp(false);
             }
         } else {
-            nextLevel = currentStorey.getLevel() - 1;
+            nextLevel = currentLevel.getValue() - 1;
             if (nextLevel == 0) {
                 elevator.setDirectionUp(true);
             }
         }
 
-        logger.info(MessageConstants.MOVING_ELEVATOR, currentStorey.getLevel(), nextLevel);
-        currentStorey = elevator.getBuilding().getStories().get(nextLevel);
+        logger.info(MessageConstants.MOVING_ELEVATOR, currentLevel.getValue(), nextLevel);
+        currentLevel = elevator.getBuilding().getLevels().get(nextLevel);
     }
 
     /**
@@ -205,7 +209,7 @@ public class Controller {
      */
     private void notifyNewStory() {
         transported.signalAll();
-        storyConditions[currentStorey.getLevel()].signalAll();
+        levelConditions[currentLevel.getValue()].signalAll();
     }
 
     /**
@@ -219,16 +223,16 @@ public class Controller {
     public void awaitBoarding(Passenger passenger) {
         Objects.requireNonNull(passenger);
         try {
-            while (passenger.getInitialStory() != currentStorey.getLevel()
+            while (passenger.getInitialLevel() != currentLevel.getValue()
                     || passenger.isDestinationUpward() != elevator.isDirectionUp()
                     || elevator.isFull()) {
 
-                if (passenger.getInitialStory() == currentStorey.getLevel()
+                if (passenger.getInitialLevel() == currentLevel.getValue()
                         && passenger.isDestinationUpward() != elevator.isDirectionUp()) {
                     ignorePassengersCount.incrementAndGet();
                 }
 
-                storyConditions[passenger.getInitialStory()].await();
+                levelConditions[passenger.getInitialLevel()].await();
             }
         } catch (InterruptedException e) {
             logger.catching(e);
@@ -236,17 +240,17 @@ public class Controller {
     }
 
     /**
-     * Boards specified passenger to elevator. If current storey dispatch is empty, increments corresponding counter.
+     * Boards specified passenger to elevator. If current level dispatch is empty, increments corresponding counter.
      *
      * @param passenger passenger to be embarked to elevators cab.
      */
-    public void embarkPassenger(Passenger passenger) {
+    public void boardPassenger(Passenger passenger) {
         Objects.requireNonNull(passenger);
-        logger.info(MessageConstants.BOARDING_OF_PASSENGER, passenger.getId(), currentStorey.getLevel());
-        currentStorey.getDispatchContainer().remove(passenger);
+        logger.info(MessageConstants.BOARDING_OF_PASSENGER, passenger.getId(), currentLevel.getValue());
+        currentLevel.getDispatchContainer().remove(passenger);
         elevator.boardPassenger(passenger);
-        if (currentStorey.getDispatchContainer().isEmpty()) {
-            emptyDispatch.add(currentStorey.getLevel());
+        if (currentLevel.getDispatchContainer().isEmpty()) {
+            emptyDispatch.add(currentLevel.getValue());
         }
     }
 
@@ -258,7 +262,7 @@ public class Controller {
     public void awaitTransportation(Passenger passenger) {
         Objects.requireNonNull(passenger);
         try {
-            while (passenger.getDestinationStory() != currentStorey.getLevel()) {
+            while (passenger.getDestinationLevel() != currentLevel.getValue()) {
                 transported.await();
             }
         } catch (InterruptedException e) {
@@ -267,14 +271,14 @@ public class Controller {
     }
 
     /**
-     * Removes passenger from elevator when he is transported to his destination storey.
+     * Removes passenger from elevator when he is transported to his destination level.
      *
      * @param passenger passenger to deboard from elevator.
      */
-    public void disembarkPassenger(Passenger passenger) {
+    public void unboardPassenger(Passenger passenger) {
         Objects.requireNonNull(passenger);
-        logger.info(MessageConstants.UNBOARDING_OF_PASSENGER, passenger.getId(), currentStorey.getLevel());
-        elevator.deboardPassenger(passenger);
-        currentStorey.getArrivalContainer().add(passenger);
+        logger.info(MessageConstants.UNBOARDING_OF_PASSENGER, passenger.getId(), currentLevel.getValue());
+        elevator.unboardPassenger(passenger);
+        currentLevel.getArrivalContainer().add(passenger);
     }
 }

@@ -4,42 +4,33 @@ import by.training.elevator.conf.Configuration;
 import by.training.elevator.entity.building.Building;
 import by.training.elevator.entity.building.Controller;
 import by.training.elevator.entity.building.Elevator;
-import by.training.elevator.entity.building.Storey;
+import by.training.elevator.entity.building.Level;
 import by.training.elevator.entity.passenger.Passenger;
 import by.training.elevator.entity.passenger.PassengerFactory;
-
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 public final class Initializer {
 
-    public static Building initBuilding() {
-        int storeysCount = Configuration.STOREYS_COUNT;
+    public static Controller initSimulation() {
+        int levelsCount = Configuration.LEVELS_COUNT;
 
-        List<Storey> storeys = new ArrayList<>(storeysCount);
+        List<Level> levels = new ArrayList<>(levelsCount);
 
-        for (int i = 0; i < storeysCount; i++) {
-            storeys.add(new Storey(i));
+        for (int i = 0; i < levelsCount; i++) {
+            levels.add(new Level(i));
         }
 
         Passenger passenger;
         for (int i = 0; i < Configuration.PASSENGERS_NUMBER; i++) {
             passenger = PassengerFactory.producePassenger();
-            storeys.get(passenger.getInitialStory()).getDispatchContainer().add(passenger);
+            levels.get(passenger.getInitialLevel()).getDispatchContainer().add(passenger);
         }
 
-        Building building = new Building(storeys);
-        Elevator elevator = new Elevator(Configuration.ELEVATOR_CAPACITY);
+        Building building = new Building(levels);
+        Elevator elevator = new Elevator(Configuration.ELEVATOR_CAPACITY, building);
+        Controller controller = new Controller(levelsCount, elevator);
 
-        building.setElevator(elevator);
-        elevator.setBuilding(building);
-
-        Controller controller = new Controller(storeysCount);
-
-        elevator.setController(controller);
-        controller.setElevator(elevator);
-
-        return building;
+        return controller;
     }
 }

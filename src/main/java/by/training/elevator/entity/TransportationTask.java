@@ -7,7 +7,6 @@ import java.util.Objects;
 import java.util.concurrent.Callable;
 
 import by.training.elevator.entity.passenger.TransportationState;
-import org.apache.logging.log4j.LogManager;
 
 public class TransportationTask implements Callable<Void> {
     private Passenger passenger;
@@ -25,9 +24,9 @@ public class TransportationTask implements Callable<Void> {
         try {
             controller.acquireLock();
             controller.awaitBoarding(passenger);
-            controller.embarkPassenger(passenger);
+            controller.boardPassenger(passenger);
             controller.awaitTransportation(passenger);
-            controller.disembarkPassenger(passenger);
+            controller.unboardPassenger(passenger);
         } finally {
             controller.releaseLock();
         }
