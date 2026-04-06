@@ -29,7 +29,7 @@ public final class Initializer {
         for (int i = 0; i < Configuration.PASSENGERS_NUMBER; i++) {
             passenger = PassengerFactory.producePassenger();
             logger.info("Initialized {}", passenger);
-            levels.get(passenger.getInitialLevel()).getDispatchContainer().add(passenger);
+            levels.get(passenger.getInitialLevel()).addForDeparture(passenger);
         }
 
         Building building = new Building(levels);

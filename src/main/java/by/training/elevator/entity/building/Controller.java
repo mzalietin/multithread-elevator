@@ -21,7 +21,7 @@ public class Controller {
     private final Elevator elevator;
 
     private static final Logger logger = LogManager.getRootLogger();
-    private final Set<Integer> emptyDispatches = new HashSet<>();
+    private final Set<Level> emptyLevels = new HashSet<>();
     private final int levelsCount;
     private final int minLevel;
     private final int maxLevel;
@@ -123,11 +123,11 @@ public class Controller {
 
     public void boardPassenger(Passenger passenger) {
         logger.info(MessageConstants.BOARDING_OF_PASSENGER, passenger.getId(), currentLevel.getValue());
-        currentLevel.getDispatchContainer().remove(passenger);
+        currentLevel.removeFromDeparture(passenger);
         elevator.boardPassenger(passenger);
         passenger.setState(TransportationState.IN_PROGRESS);
-        if (currentLevel.getDispatchContainer().isEmpty()) {
-            emptyDispatches.add(currentLevel.getValue());
+        if (currentLevel.isDepartureEmpty()) {
+            emptyLevels.add(currentLevel);
         }
     }
 
@@ -142,7 +142,7 @@ public class Controller {
     public void unboardPassenger(Passenger passenger) {
         logger.info(MessageConstants.UNBOARDING_OF_PASSENGER, passenger.getId(), currentLevel.getValue());
         elevator.unboardPassenger(passenger);
-        currentLevel.getArrivalContainer().add(passenger);
+        currentLevel.addToArrival(passenger);
     }
 
     private class Worker extends Thread {
@@ -150,10 +150,10 @@ public class Controller {
         @Override
         public void run() {
             logger.info(MessageConstants.STARTING_TRANSPORTATION);
-            // save levels with empty dispatches beforehand
+            // save empty levels dispatches beforehand
             elevator.getBuilding().getLevels().stream()
-                    .filter(level -> level.getDispatchContainer().isEmpty())
-                    .forEach(level -> emptyDispatches.add(level.getValue()));
+                    .filter(Level::isDepartureEmpty)
+                    .forEach(emptyLevels::add);
             // initial signal
             try {
                 lock.lock();
@@ -164,7 +164,7 @@ public class Controller {
             while (true) {
                 try {
                     lock.lock();
-                    if (emptyDispatches.size() == levelsCount && elevator.isEmpty()) {
+                    if (emptyLevels.size() == levelsCount && elevator.isEmpty()) {
                         break;
                     }
                     moveElevator();
@@ -184,12 +184,12 @@ public class Controller {
         int arrivedPassengersCount = 0;
 
         for (Level st : elevator.getBuilding().getLevels()) {
-            logger.info("Level {} dispatch is empty - {}", st.getValue(), st.getDispatchContainer().isEmpty());
-            assert st.getDispatchContainer().isEmpty();
+            logger.info("Level {} dispatch is empty - {}", st.getValue(), st.isDepartureEmpty());
+            assert st.isDepartureEmpty();
 
-            arrivedPassengersCount += st.getArrivalContainer().size();
+            arrivedPassengersCount += st.arrivedPassengers().size();
 
-            for (Passenger pas : st.getArrivalContainer()) {
+            for (Passenger pas : st.arrivedPassengers()) {
                 logger.info("Passenger #{} with destination {} is in level {} arrival", pas.getId(), pas.getDestinationLevel(),
                         st.getValue());
                 assert pas.getDestinationLevel() == st.getValue();
