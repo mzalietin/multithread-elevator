@@ -16,15 +16,10 @@ public class TransportationTask implements Runnable {
 
     @Override
     public void run() {
-        try {
-            controller.acquireLock();
-            controller.awaitBoarding(passenger);
-            controller.boardPassenger(passenger);
-            controller.awaitTransportation(passenger);
-            controller.unboardPassenger(passenger);
-        } finally {
-            controller.releaseLock();
-        }
+        controller.awaitBoarding(passenger);
+        controller.boardPassenger(passenger);
+        controller.awaitTransportation(passenger);
+        controller.unboardPassenger(passenger);
         passenger.setState(TransportationState.COMPLETED);
     }
 }

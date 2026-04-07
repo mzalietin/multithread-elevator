@@ -18,6 +18,12 @@ public final class Initializer {
 
     public static Controller initSimulation() {
         int levelsCount = Configuration.LEVELS_COUNT;
+        int passengersNumber = Configuration.PASSENGERS_NUMBER;
+        int elevatorCapacity = Configuration.ELEVATOR_CAPACITY;
+
+        assert levelsCount > 1;
+        assert passengersNumber > 0;
+        assert elevatorCapacity > 0;
 
         List<Level> levels = new ArrayList<>(levelsCount);
 
@@ -26,14 +32,14 @@ public final class Initializer {
         }
 
         Passenger passenger;
-        for (int i = 0; i < Configuration.PASSENGERS_NUMBER; i++) {
+        for (int i = 0; i < passengersNumber; i++) {
             passenger = PassengerFactory.producePassenger();
             logger.info("Initialized {}", passenger);
             levels.get(passenger.getInitialLevel()).addForDeparture(passenger);
         }
 
         Building building = new Building(levels);
-        Elevator elevator = new Elevator(Configuration.ELEVATOR_CAPACITY, building);
+        Elevator elevator = new Elevator(elevatorCapacity, building);
         Controller controller = new Controller(levelsCount, elevator);
 
         return controller;

@@ -17,7 +17,7 @@ public class Building {
         return levels;
     }
 
-    public List<Passenger> allPassengers() {
+    public List<Passenger> remainingPassengers() {
         return levels.stream().flatMap(Level::remainingPassengers).collect(Collectors.toList());
     }
 }

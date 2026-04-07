@@ -1,10 +1,11 @@
 package by.training.elevator.entity.passenger;
 
 import by.training.elevator.conf.Configuration;
+import java.util.Random;
 
 public class PassengerFactory {
 
-    private static int idSource = 0;
+    private static final Random random = new Random();
 
     public static Passenger producePassenger() {
         int init = generateLevel();
@@ -14,10 +15,10 @@ public class PassengerFactory {
             dest = generateLevel();
         }
 
-        return new Passenger(++idSource, init, dest);
+        return new Passenger(String.format("pas-%d", random.nextInt(10_000)), init, dest);
     }
 
     private static int generateLevel() {
-        return (int) (Math.random() * Configuration.LEVELS_COUNT);
+        return random.nextInt(Configuration.LEVELS_COUNT);
     }
 }

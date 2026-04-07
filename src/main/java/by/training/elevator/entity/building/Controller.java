@@ -5,9 +5,11 @@ import by.training.elevator.conf.MessageConstants;
 import by.training.elevator.entity.TransportationTask;
 import by.training.elevator.entity.passenger.Passenger;
 import by.training.elevator.entity.passenger.TransportationState;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -21,40 +23,31 @@ public class Controller {
     private final Elevator elevator;
 
     private static final Logger logger = LogManager.getRootLogger();
-    private final Set<Level> emptyLevels = new HashSet<>();
+    private final Set<Level> emptyLevels = Collections.synchronizedSet(new HashSet<>());
     private final int levelsCount;
     private final int minLevel;
     private final int maxLevel;
 
     private final Lock lock = new ReentrantLock(true);
     private final Condition[] elevatorArrived;
+    private final Condition[] onboarding;
 
     private Level currentLevel;
     private boolean directionUp;
 
     public Controller(int levelsCount, Elevator elevator) {
-        if (levelsCount > 0) {
-            this.elevatorArrived = new Condition[levelsCount];
-            for (int i = 0; i < levelsCount; i++) {
-                this.elevatorArrived[i] = lock.newCondition();
-            }
-            this.levelsCount = levelsCount;
-            this.minLevel = 0;
-            this.maxLevel = levelsCount - 1;
-            this.elevator = Objects.requireNonNull(elevator);
-            this.currentLevel = elevator.getBuilding().getLevels().get(0);
-            this.directionUp = true;
-        } else {
-            throw new IllegalArgumentException("Levels count cannot be negative/zero");
+        this.elevatorArrived = new Condition[levelsCount];
+        this.onboarding = new Condition[levelsCount];
+        for (int i = 0; i < levelsCount; i++) {
+            this.elevatorArrived[i] = lock.newCondition();
+            this.onboarding[i] = lock.newCondition();
         }
-    }
-
-    public void acquireLock() {
-        lock.lock();
-    }
-
-    public void releaseLock() {
-        lock.unlock();
+        this.levelsCount = levelsCount;
+        this.minLevel = 0;
+        this.maxLevel = levelsCount - 1;
+        this.elevator = Objects.requireNonNull(elevator);
+        this.currentLevel = elevator.getBuilding().getLevels().get(minLevel);
+        this.directionUp = true;
     }
 
     public int getCurrentLevel() {
@@ -67,7 +60,7 @@ public class Controller {
 
     public void startTransportation() {
         try {
-            List<Passenger> passengers = elevator.getBuilding().allPassengers();
+            List<Passenger> passengers = elevator.getBuilding().remainingPassengers();
 
             ExecutorService threadPool = Executors.newFixedThreadPool(passengers.size());
 
@@ -84,33 +77,11 @@ public class Controller {
         }
     }
 
-    private void moveElevator() {
-        int nextLevel;
-
-        if (directionUp) {
-            nextLevel = currentLevel.getValue() + 1;
-        } else {
-            nextLevel = currentLevel.getValue() - 1;
-        }
-
-        logger.info(MessageConstants.MOVING_ELEVATOR, directionUp ? "UP" : "DOWN", currentLevel.getValue(), nextLevel);
-        currentLevel = elevator.getBuilding().getLevels().get(nextLevel);
-
-        if (currentLevel.getValue() == maxLevel) {
-            directionUp = false;
-        } else if (currentLevel.getValue() == minLevel) {
-            directionUp = true;
-        }
-    }
-
-    private void notifyNewLevel() {
-        elevatorArrived[currentLevel.getValue()].signalAll();
-    }
-
     public void awaitBoarding(Passenger passenger) {
         try {
+            lock.lock();
             do {
-                elevatorArrived[passenger.getInitialLevel()].await();
+                onboarding[passenger.getInitialLevel()].await();
             } while (!directionsMatch(passenger) || elevator.isFull());
         } catch (InterruptedException e) {
             logger.catching(e);
@@ -122,11 +93,12 @@ public class Controller {
     }
 
     public void boardPassenger(Passenger passenger) {
+        assert passenger.getInitialLevel() == currentLevel.getValue();
         logger.info(MessageConstants.BOARDING_OF_PASSENGER, passenger.getId(), currentLevel.getValue());
         currentLevel.removeFromDeparture(passenger);
         elevator.boardPassenger(passenger);
         passenger.setState(TransportationState.IN_PROGRESS);
-        if (currentLevel.isDepartureEmpty()) {
+        if (currentLevel.departuresEmpty()) {
             emptyLevels.add(currentLevel);
         }
     }
@@ -140,9 +112,11 @@ public class Controller {
     }
 
     public void unboardPassenger(Passenger passenger) {
+        assert passenger.getDestinationLevel() == currentLevel.getValue();
         logger.info(MessageConstants.UNBOARDING_OF_PASSENGER, passenger.getId(), currentLevel.getValue());
         elevator.unboardPassenger(passenger);
         currentLevel.addToArrival(passenger);
+        lock.unlock();
     }
 
     private class Worker extends Thread {
@@ -152,29 +126,109 @@ public class Controller {
             logger.info(MessageConstants.STARTING_TRANSPORTATION);
             // save empty levels dispatches beforehand
             elevator.getBuilding().getLevels().stream()
-                    .filter(Level::isDepartureEmpty)
+                    .filter(Level::departuresEmpty)
                     .forEach(emptyLevels::add);
             // initial signal
             try {
                 lock.lock();
-                elevatorArrived[0].signalAll();
+                onboarding[0].signalAll();
             } finally {
                 lock.unlock();
             }
-            while (true) {
-                try {
-                    lock.lock();
-                    if (emptyLevels.size() == levelsCount && elevator.isEmpty()) {
-                        break;
-                    }
-                    moveElevator();
-                    notifyNewLevel();
-                } finally {
-                    lock.unlock();
-                }
+            while (emptyLevels.size() != levelsCount || !elevator.isEmpty()) {
+                moveElevator();
             }
 
             logger.info(MessageConstants.TRANSPORTATION_COMPLETE);
+        }
+    }
+
+    private void moveElevator() {
+        try {
+            lock.lock();
+
+            int nextLevel;
+            int curLevel = currentLevel.getValue();
+
+            OptionalInt elevatorNextDestination = elevator.closestDestination(directionUp, curLevel);
+            boolean elevatorNextDestinationPresent = elevatorNextDestination.isPresent();
+            OptionalInt nextAwaitingPassengerLevel;
+
+            if (directionUp) {
+                List<Level> upperLevels = elevator.getBuilding().getLevels().subList(curLevel + 1, levelsCount);
+                if (elevatorNextDestination.isPresent()) {
+                    nextAwaitingPassengerLevel = upperLevels.stream()
+                            .filter(l -> !l.departureUpEmpty())
+                            .mapToInt(Level::getValue)
+                            .min();
+                    if (nextAwaitingPassengerLevel.isPresent()) {
+                        nextLevel = Integer.min(elevatorNextDestination.getAsInt(), nextAwaitingPassengerLevel.getAsInt());
+                    } else {
+                        nextLevel = elevatorNextDestination.getAsInt();
+                    }
+                } else {
+                    nextAwaitingPassengerLevel = upperLevels.stream()
+                            .filter(l -> !l.departureUpEmpty() || !l.departureDownEmpty())
+                            .mapToInt(Level::getValue)
+                            .min();
+                    if (nextAwaitingPassengerLevel.isPresent()) {
+                        nextLevel = nextAwaitingPassengerLevel.getAsInt();
+                    } else {
+                        logger.warn("directionUp = {}", directionUp);
+                        logger.warn("cabin = {}", elevator.getCabin());
+                        logger.warn("remainingPassengers = {}", elevator.getBuilding().remainingPassengers());
+                        throw new IllegalStateException("Should not get here!");
+                    }
+                }
+            } else {
+                List<Level> lowerLevels = elevator.getBuilding().getLevels().subList(minLevel, curLevel);
+                if (elevatorNextDestination.isPresent()) {
+                    nextAwaitingPassengerLevel = lowerLevels.stream()
+                            .filter(l -> !l.departureDownEmpty())
+                            .mapToInt(Level::getValue)
+                            .max();
+                    if (nextAwaitingPassengerLevel.isPresent()) {
+                        nextLevel = Integer.max(elevatorNextDestination.getAsInt(), nextAwaitingPassengerLevel.getAsInt());
+                    } else {
+                        nextLevel = elevatorNextDestination.getAsInt();
+                    }
+                } else {
+                    nextAwaitingPassengerLevel = lowerLevels.stream()
+                            .filter(l -> !l.departureUpEmpty() || !l.departureDownEmpty())
+                            .mapToInt(Level::getValue)
+                            .max();
+                    if (nextAwaitingPassengerLevel.isPresent()) {
+                        nextLevel = nextAwaitingPassengerLevel.getAsInt();
+                    } else {
+                        logger.warn("directionUp = {}", directionUp);
+                        logger.warn("cabin = {}", elevator.getCabin());
+                        logger.warn("remainingPassengers = {}", elevator.getBuilding().remainingPassengers());
+                        throw new IllegalStateException("Should not get here!");
+                    }
+                }
+            }
+
+            logger.info(MessageConstants.MOVING_ELEVATOR, directionUp ? "UP" : "DOWN", curLevel, nextLevel);
+
+            currentLevel = elevator.getBuilding().getLevels().get(nextLevel);
+
+            elevatorArrived[currentLevel.getValue()].signalAll();
+
+            if (directionUp) {
+                if ((currentLevel.departureUpEmpty() && elevator.isEmpty()) || currentLevel.getValue() == maxLevel) {
+                    logger.info("flip direction to DOWN");
+                    directionUp = false;
+                }
+            } else {
+                if (currentLevel.departureDownEmpty() && elevator.isEmpty() || currentLevel.getValue() == minLevel) {
+                    logger.info("flip direction to UP");
+                    directionUp = true;
+                }
+            }
+
+            onboarding[currentLevel.getValue()].signalAll();
+        } finally {
+            lock.unlock();
         }
     }
 
@@ -184,8 +238,8 @@ public class Controller {
         int arrivedPassengersCount = 0;
 
         for (Level st : elevator.getBuilding().getLevels()) {
-            logger.info("Level {} dispatch is empty - {}", st.getValue(), st.isDepartureEmpty());
-            assert st.isDepartureEmpty();
+            logger.info("Level {} dispatch is empty - {}", st.getValue(), st.departuresEmpty());
+            assert st.departuresEmpty();
 
             arrivedPassengersCount += st.arrivedPassengers().size();
 

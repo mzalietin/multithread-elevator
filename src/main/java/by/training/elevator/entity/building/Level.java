@@ -13,11 +13,7 @@ public class Level {
     private final Set<Passenger> arrivalContainer;
 
     public Level(int value) {
-        if (value >= 0) {
-            this.value = value;
-        } else {
-            throw new IllegalArgumentException("Level value cannot be negative");
-        }
+        this.value = value;
         this.departureUpGroup = new HashSet<>();
         this.arrivalContainer = new HashSet<>();
         this.departureDownGroup = new HashSet<>();
@@ -47,7 +43,15 @@ public class Level {
         return Stream.concat(this.departureUpGroup.stream(), this.departureDownGroup.stream());
     }
 
-    public boolean isDepartureEmpty() {
+    public boolean departureUpEmpty() {
+        return departureUpGroup.isEmpty();
+    }
+
+    public boolean departureDownEmpty() {
+        return departureDownGroup.isEmpty();
+    }
+
+    public boolean departuresEmpty() {
         return this.departureUpGroup.isEmpty() && this.departureDownGroup.isEmpty();
     }
 

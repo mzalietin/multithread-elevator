@@ -1,19 +1,21 @@
 package by.training.elevator.entity.passenger;
 
+import java.util.Objects;
+
 public class Passenger {
-    private final int id;
+    private final String id;
     private final int initialLevel;
     private final int destinationLevel;
     private TransportationState state;
 
-    public Passenger(int id, int initialLevel, int destinationLevel) {
+    public Passenger(String id, int initialLevel, int destinationLevel) {
         this.id = id;
         this.initialLevel = initialLevel;
         this.destinationLevel = destinationLevel;
         state = TransportationState.NOT_STARTED;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
@@ -38,29 +40,23 @@ public class Passenger {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Passenger passenger = (Passenger) o;
-
-        if (id != passenger.id) return false;
-        if (initialLevel != passenger.initialLevel) return false;
-        return destinationLevel == passenger.destinationLevel;
+    public boolean equals(final Object o) {
+        if (o == null || getClass() != o.getClass())
+            return false;
+        final Passenger passenger = (Passenger) o;
+        return initialLevel == passenger.initialLevel && destinationLevel == passenger.destinationLevel && Objects.equals(id,
+                passenger.id);
     }
 
     @Override
     public int hashCode() {
-        int result = id;
-        result = 31 * result + initialLevel;
-        result = 31 * result + destinationLevel;
-        return result;
+        return Objects.hash(id, initialLevel, destinationLevel);
     }
 
     @Override
     public String toString() {
         return "Passenger{" +
-                "id=" + id +
+                "id='" + id + '\'' +
                 ", initialLevel=" + initialLevel +
                 ", destinationLevel=" + destinationLevel +
                 ", state=" + state +
