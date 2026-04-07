@@ -214,13 +214,19 @@ public class Controller {
 
             elevatorArrived[currentLevel.getValue()].signalAll();
 
+            //todo this is logged BEFORE arrival message
+            logger.warn("directionUp = {}", directionUp);
+            logger.warn("cabinEmpty = {}", elevator.isEmpty());
+            logger.warn("departureUpEmpty = {}", currentLevel.departureUpEmpty());
+            logger.warn("departureDownEmpty = {}", currentLevel.departureDownEmpty());
+
             if (directionUp) {
                 if ((currentLevel.departureUpEmpty() && elevator.isEmpty()) || currentLevel.getValue() == maxLevel) {
                     logger.info("flip direction to DOWN");
                     directionUp = false;
                 }
             } else {
-                if (currentLevel.departureDownEmpty() && elevator.isEmpty() || currentLevel.getValue() == minLevel) {
+                if ((currentLevel.departureDownEmpty() && elevator.isEmpty()) || currentLevel.getValue() == minLevel) {
                     logger.info("flip direction to UP");
                     directionUp = true;
                 }

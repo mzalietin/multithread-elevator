@@ -1,151 +1,45 @@
-17:35:57.639 INFO   - Initialized Passenger{id='pas-8680', initialLevel=18, destinationLevel=12, state=NOT_STARTED}
-17:35:57.643 INFO   - Initialized Passenger{id='pas-7904', initialLevel=18, destinationLevel=0, state=NOT_STARTED}
-17:35:57.644 INFO   - Initialized Passenger{id='pas-9841', initialLevel=6, destinationLevel=16, state=NOT_STARTED}
-17:35:57.644 INFO   - Initialized Passenger{id='pas-3714', initialLevel=7, destinationLevel=0, state=NOT_STARTED}
-17:35:57.644 INFO   - Initialized Passenger{id='pas-5142', initialLevel=0, destinationLevel=12, state=NOT_STARTED}
-17:35:57.644 INFO   - Initialized Passenger{id='pas-6551', initialLevel=6, destinationLevel=17, state=NOT_STARTED}
-17:35:57.644 INFO   - Initialized Passenger{id='pas-1062', initialLevel=16, destinationLevel=12, state=NOT_STARTED}
-17:35:57.644 INFO   - Initialized Passenger{id='pas-5357', initialLevel=3, destinationLevel=10, state=NOT_STARTED}
-17:35:57.644 INFO   - Initialized Passenger{id='pas-3119', initialLevel=6, destinationLevel=0, state=NOT_STARTED}
-17:35:57.644 INFO   - Initialized Passenger{id='pas-8110', initialLevel=14, destinationLevel=6, state=NOT_STARTED}
-17:35:57.644 INFO   - Initialized Passenger{id='pas-1528', initialLevel=10, destinationLevel=18, state=NOT_STARTED}
-17:35:57.644 INFO   - Initialized Passenger{id='pas-1878', initialLevel=10, destinationLevel=9, state=NOT_STARTED}
-17:35:57.644 INFO   - Initialized Passenger{id='pas-7270', initialLevel=11, destinationLevel=9, state=NOT_STARTED}
-17:35:57.644 INFO   - Initialized Passenger{id='pas-9142', initialLevel=3, destinationLevel=5, state=NOT_STARTED}
-17:35:57.644 INFO   - Initialized Passenger{id='pas-2413', initialLevel=5, destinationLevel=9, state=NOT_STARTED}
-17:35:57.644 INFO   - Initialized Passenger{id='pas-1190', initialLevel=16, destinationLevel=19, state=NOT_STARTED}
-17:35:57.645 INFO   - Initialized Passenger{id='pas-6228', initialLevel=12, destinationLevel=6, state=NOT_STARTED}
-17:35:57.645 INFO   - Initialized Passenger{id='pas-2340', initialLevel=5, destinationLevel=7, state=NOT_STARTED}
-17:35:57.645 INFO   - Initialized Passenger{id='pas-2519', initialLevel=8, destinationLevel=7, state=NOT_STARTED}
-17:35:57.645 INFO   - Initialized Passenger{id='pas-5950', initialLevel=19, destinationLevel=8, state=NOT_STARTED}
-17:35:57.683 INFO   - Transportation process started
-17:35:57.683 INFO   - Passenger #pas-5142 picked up at level 0
-17:35:57.688 INFO   - Moving elevator UP from level 0 to level 3
-17:35:57.688 INFO   - Passenger #pas-5357 picked up at level 3
-17:35:57.688 INFO   - Passenger #pas-9142 picked up at level 3
-17:35:57.690 INFO   - Moving elevator UP from level 3 to level 5
-17:35:57.690 INFO   - Passenger #pas-9142 arrived at level 5
-17:35:57.690 INFO   - Passenger #pas-2340 picked up at level 5
-17:35:57.690 INFO   - Passenger #pas-2413 picked up at level 5
-17:35:57.690 INFO   - Moving elevator UP from level 5 to level 6
-17:35:57.690 INFO   - Passenger #pas-9841 picked up at level 6
-17:35:57.690 INFO   - Moving elevator UP from level 6 to level 7
-17:35:57.690 INFO   - Passenger #pas-2340 arrived at level 7
-17:35:57.690 INFO   - Moving elevator UP from level 7 to level 9
-17:35:57.690 INFO   - Passenger #pas-2413 arrived at level 9
-17:35:57.690 INFO   - Moving elevator UP from level 9 to level 10
-17:35:57.690 INFO   - Passenger #pas-5357 arrived at level 10
-17:35:57.690 INFO   - Passenger #pas-1528 picked up at level 10
-17:35:57.690 INFO   - Moving elevator UP from level 10 to level 12
-17:35:57.690 INFO   - Passenger #pas-5142 arrived at level 12
-17:35:57.690 INFO   - Moving elevator UP from level 12 to level 16
-17:35:57.690 INFO   - Passenger #pas-9841 arrived at level 16
-17:35:57.690 INFO   - Passenger #pas-1190 picked up at level 16
-17:35:57.694 INFO   - Moving elevator UP from level 16 to level 18
-17:35:57.694 INFO   - Passenger #pas-1528 arrived at level 18
-17:35:57.694 INFO   - Moving elevator UP from level 18 to level 19
-17:35:57.694 INFO   - flip direction to DOWN
-17:35:57.694 INFO   - Passenger #pas-1190 arrived at level 19
-17:35:57.694 INFO   - Passenger #pas-5950 picked up at level 19
-17:35:57.695 INFO   - Moving elevator DOWN from level 19 to level 18
-17:35:57.695 INFO   - Passenger #pas-7904 picked up at level 18
-17:35:57.695 INFO   - Passenger #pas-8680 picked up at level 18
-17:35:57.696 INFO   - Moving elevator DOWN from level 18 to level 16
-17:35:57.696 INFO   - Passenger #pas-1062 picked up at level 16
-17:35:57.698 INFO   - Moving elevator DOWN from level 16 to level 14
-17:35:57.698 INFO   - Passenger #pas-8110 picked up at level 14
-17:35:57.699 INFO   - Moving elevator DOWN from level 14 to level 12
-17:35:57.699 INFO   - Passenger #pas-8680 arrived at level 12
-17:35:57.699 INFO   - Passenger #pas-1062 arrived at level 12
-17:35:57.699 INFO   - Passenger #pas-6228 picked up at level 12
-17:35:57.699 INFO   - Moving elevator DOWN from level 12 to level 11
-17:35:57.699 INFO   - Passenger #pas-7270 picked up at level 11
-17:35:57.699 INFO   - Moving elevator DOWN from level 11 to level 10
-17:35:57.699 INFO   - Passenger #pas-1878 picked up at level 10
-17:35:57.699 INFO   - Moving elevator DOWN from level 10 to level 9
-17:35:57.699 INFO   - Passenger #pas-7270 arrived at level 9
-17:35:57.699 INFO   - Passenger #pas-1878 arrived at level 9
-17:35:57.699 INFO   - Moving elevator DOWN from level 9 to level 8
-17:35:57.699 INFO   - Passenger #pas-5950 arrived at level 8
-17:35:57.699 INFO   - Passenger #pas-2519 picked up at level 8
-17:35:57.699 INFO   - Moving elevator DOWN from level 8 to level 7
-17:35:57.699 INFO   - Passenger #pas-2519 arrived at level 7
-17:35:57.699 INFO   - Passenger #pas-3714 picked up at level 7
-17:35:57.699 INFO   - Moving elevator DOWN from level 7 to level 6
-17:35:57.699 INFO   - Passenger #pas-8110 arrived at level 6
-17:35:57.699 INFO   - Passenger #pas-6228 arrived at level 6
-17:35:57.699 INFO   - Passenger #pas-3119 picked up at level 6
-17:35:57.703 INFO   - Moving elevator DOWN from level 6 to level 0
-17:35:57.703 INFO   - flip direction to UP
-17:35:57.703 INFO   - Passenger #pas-7904 arrived at level 0
-17:35:57.703 INFO   - Passenger #pas-3714 arrived at level 0
-17:35:57.703 INFO   - Passenger #pas-3119 arrived at level 0
-17:35:57.703 INFO   - Moving elevator UP from level 0 to level 6
-17:35:57.703 INFO   - Passenger #pas-6551 picked up at level 6
-17:35:57.703 INFO   - Moving elevator UP from level 6 to level 17
-17:35:57.703 INFO   - Passenger #pas-6551 arrived at level 17
-17:35:57.703 WARN   - directionUp = true
-17:35:57.703 WARN   - cabin = []
-17:35:57.703 WARN   - remainingPassengers = []
-17:35:57.703 INFO   - ------ VALIDATION PROCESS ------
-17:35:57.703 INFO   - Level 0 dispatch is empty - true
-17:35:57.703 INFO   - Passenger #pas-3119 with destination 0 is in level 0 arrival
-17:35:57.703 INFO   - Passenger #pas-3119 state COMPLETED
-17:35:57.703 INFO   - Passenger #pas-7904 with destination 0 is in level 0 arrival
-17:35:57.703 INFO   - Passenger #pas-7904 state COMPLETED
-17:35:57.703 INFO   - Passenger #pas-3714 with destination 0 is in level 0 arrival
-17:35:57.703 INFO   - Passenger #pas-3714 state COMPLETED
-17:35:57.706 INFO   - Level 1 dispatch is empty - true
-17:35:57.706 INFO   - Level 2 dispatch is empty - true
-17:35:57.706 INFO   - Level 3 dispatch is empty - true
-17:35:57.706 INFO   - Level 4 dispatch is empty - true
-17:35:57.706 INFO   - Level 5 dispatch is empty - true
-17:35:57.706 INFO   - Passenger #pas-9142 with destination 5 is in level 5 arrival
-17:35:57.706 INFO   - Passenger #pas-9142 state COMPLETED
-17:35:57.706 INFO   - Level 6 dispatch is empty - true
-17:35:57.706 INFO   - Passenger #pas-8110 with destination 6 is in level 6 arrival
-17:35:57.706 INFO   - Passenger #pas-8110 state COMPLETED
-17:35:57.706 INFO   - Passenger #pas-6228 with destination 6 is in level 6 arrival
-17:35:57.706 INFO   - Passenger #pas-6228 state COMPLETED
-17:35:57.706 INFO   - Level 7 dispatch is empty - true
-17:35:57.706 INFO   - Passenger #pas-2340 with destination 7 is in level 7 arrival
-17:35:57.706 INFO   - Passenger #pas-2340 state COMPLETED
-17:35:57.706 INFO   - Passenger #pas-2519 with destination 7 is in level 7 arrival
-17:35:57.706 INFO   - Passenger #pas-2519 state COMPLETED
-17:35:57.706 INFO   - Level 8 dispatch is empty - true
-17:35:57.706 INFO   - Passenger #pas-5950 with destination 8 is in level 8 arrival
-17:35:57.706 INFO   - Passenger #pas-5950 state COMPLETED
-17:35:57.706 INFO   - Level 9 dispatch is empty - true
-17:35:57.706 INFO   - Passenger #pas-2413 with destination 9 is in level 9 arrival
-17:35:57.706 INFO   - Passenger #pas-2413 state COMPLETED
-17:35:57.706 INFO   - Passenger #pas-7270 with destination 9 is in level 9 arrival
-17:35:57.706 INFO   - Passenger #pas-7270 state COMPLETED
-17:35:57.706 INFO   - Passenger #pas-1878 with destination 9 is in level 9 arrival
-17:35:57.706 INFO   - Passenger #pas-1878 state COMPLETED
-17:35:57.706 INFO   - Level 10 dispatch is empty - true
-17:35:57.706 INFO   - Passenger #pas-5357 with destination 10 is in level 10 arrival
-17:35:57.706 INFO   - Passenger #pas-5357 state COMPLETED
-17:35:57.706 INFO   - Level 11 dispatch is empty - true
-17:35:57.706 INFO   - Level 12 dispatch is empty - true
-17:35:57.706 INFO   - Passenger #pas-8680 with destination 12 is in level 12 arrival
-17:35:57.706 INFO   - Passenger #pas-8680 state COMPLETED
-17:35:57.706 INFO   - Passenger #pas-5142 with destination 12 is in level 12 arrival
-17:35:57.706 INFO   - Passenger #pas-5142 state COMPLETED
-17:35:57.706 INFO   - Passenger #pas-1062 with destination 12 is in level 12 arrival
-17:35:57.706 INFO   - Passenger #pas-1062 state COMPLETED
-17:35:57.706 INFO   - Level 13 dispatch is empty - true
-17:35:57.706 INFO   - Level 14 dispatch is empty - true
-17:35:57.706 INFO   - Level 15 dispatch is empty - true
-17:35:57.706 INFO   - Level 16 dispatch is empty - true
-17:35:57.706 INFO   - Passenger #pas-9841 with destination 16 is in level 16 arrival
-17:35:57.706 INFO   - Passenger #pas-9841 state COMPLETED
-17:35:57.706 INFO   - Level 17 dispatch is empty - true
-17:35:57.706 INFO   - Passenger #pas-6551 with destination 17 is in level 17 arrival
-17:35:57.706 INFO   - Passenger #pas-6551 state COMPLETED
-17:35:57.706 INFO   - Level 18 dispatch is empty - true
-17:35:57.706 INFO   - Passenger #pas-1528 with destination 18 is in level 18 arrival
-17:35:57.706 INFO   - Passenger #pas-1528 state COMPLETED
-17:35:57.706 INFO   - Level 19 dispatch is empty - true
-17:35:57.706 INFO   - Passenger #pas-1190 with destination 19 is in level 19 arrival
-17:35:57.706 INFO   - Passenger #pas-1190 state COMPLETED
-17:35:57.706 INFO   - Arrived passenger count - 20, initial passenger count - 20
+17:57:28.363 INFO   - Initialized Passenger{id='pas-7329', initialLevel=9, destinationLevel=6, state=NOT_STARTED}
+17:57:28.363 INFO   - Initialized Passenger{id='pas-3125', initialLevel=6, destinationLevel=8, state=NOT_STARTED}
+17:57:28.363 INFO   - Initialized Passenger{id='pas-6270', initialLevel=12, destinationLevel=1, state=NOT_STARTED}
+17:57:28.363 INFO   - Initialized Passenger{id='pas-2120', initialLevel=6, destinationLevel=17, state=NOT_STARTED}
+17:57:28.363 INFO   - Initialized Passenger{id='pas-3183', initialLevel=6, destinationLevel=10, state=NOT_STARTED}
+17:57:28.363 INFO   - Initialized Passenger{id='pas-1388', initialLevel=4, destinationLevel=12, state=NOT_STARTED}
+17:57:28.363 INFO   - Initialized Passenger{id='pas-46', initialLevel=13, destinationLevel=18, state=NOT_STARTED}
+17:57:28.363 INFO   - Initialized Passenger{id='pas-6468', initialLevel=4, destinationLevel=16, state=NOT_STARTED}
+17:57:28.363 INFO   - Initialized Passenger{id='pas-9921', initialLevel=11, destinationLevel=9, state=NOT_STARTED}
+17:57:28.363 INFO   - Initialized Passenger{id='pas-5848', initialLevel=10, destinationLevel=9, state=NOT_STARTED}
+17:57:28.363 INFO   - Initialized Passenger{id='pas-6563', initialLevel=14, destinationLevel=12, state=NOT_STARTED}
+17:57:28.363 INFO   - Initialized Passenger{id='pas-2990', initialLevel=19, destinationLevel=17, state=NOT_STARTED}
+17:57:28.363 INFO   - Initialized Passenger{id='pas-5606', initialLevel=10, destinationLevel=3, state=NOT_STARTED}
+17:57:28.363 INFO   - Initialized Passenger{id='pas-3315', initialLevel=3, destinationLevel=2, state=NOT_STARTED}
+17:57:28.363 INFO   - Initialized Passenger{id='pas-6593', initialLevel=13, destinationLevel=7, state=NOT_STARTED}
+17:57:28.363 INFO   - Initialized Passenger{id='pas-8176', initialLevel=5, destinationLevel=15, state=NOT_STARTED}
+17:57:28.363 INFO   - Initialized Passenger{id='pas-4611', initialLevel=11, destinationLevel=14, state=NOT_STARTED}
+17:57:28.363 INFO   - Initialized Passenger{id='pas-998', initialLevel=12, destinationLevel=8, state=NOT_STARTED}
+17:57:28.363 INFO   - Initialized Passenger{id='pas-1335', initialLevel=14, destinationLevel=6, state=NOT_STARTED}
+17:57:28.363 INFO   - Initialized Passenger{id='pas-5658', initialLevel=18, destinationLevel=12, state=NOT_STARTED}
+17:57:28.416 INFO   - Transportation process started
+17:57:28.416 INFO   - Moving elevator UP from level 0 to level 3
+17:57:28.416 WARN   - directionUp = true
+17:57:28.416 WARN   - cabinEmpty = true
+17:57:28.416 WARN   - departureUpEmpty = true
+17:57:28.416 WARN   - departureDownEmpty = false
+17:57:28.416 INFO   - flip direction to DOWN
+17:57:28.416 INFO   - Passenger #pas-3315 picked up at level 3
+17:57:28.416 INFO   - Moving elevator DOWN from level 3 to level 2
+17:57:28.416 WARN   - directionUp = false
+17:57:28.416 WARN   - cabinEmpty = false
+17:57:28.416 WARN   - departureUpEmpty = true
+17:57:28.416 WARN   - departureDownEmpty = true
+17:57:28.416 INFO   - Passenger #pas-3315 arrived at level 2
+17:57:28.416 WARN   - directionUp = false
+17:57:28.416 WARN   - cabin = []
+17:57:28.416 WARN   - remainingPassengers = [Passenger{id='pas-1388', initialLevel=4, destinationLevel=12, state=NOT_STARTED}, Passenger{id='pas-6468', initialLevel=4, destinationLevel=16, state=NOT_STARTED}, Passenger{id='pas-8176', initialLevel=5, destinationLevel=15, state=NOT_STARTED}, Passenger{id='pas-3183', initialLevel=6, destinationLevel=10, state=NOT_STARTED}, Passenger{id='pas-2120', initialLevel=6, destinationLevel=17, state=NOT_STARTED}, Passenger{id='pas-3125', initialLevel=6, destinationLevel=8, state=NOT_STARTED}, Passenger{id='pas-7329', initialLevel=9, destinationLevel=6, state=NOT_STARTED}, Passenger{id='pas-5606', initialLevel=10, destinationLevel=3, state=NOT_STARTED}, Passenger{id='pas-5848', initialLevel=10, destinationLevel=9, state=NOT_STARTED}, Passenger{id='pas-4611', initialLevel=11, destinationLevel=14, state=NOT_STARTED}, Passenger{id='pas-9921', initialLevel=11, destinationLevel=9, state=NOT_STARTED}, Passenger{id='pas-6270', initialLevel=12, destinationLevel=1, state=NOT_STARTED}, Passenger{id='pas-998', initialLevel=12, destinationLevel=8, state=NOT_STARTED}, Passenger{id='pas-46', initialLevel=13, destinationLevel=18, state=NOT_STARTED}, Passenger{id='pas-6593', initialLevel=13, destinationLevel=7, state=NOT_STARTED}, Passenger{id='pas-1335', initialLevel=14, destinationLevel=6, state=NOT_STARTED}, Passenger{id='pas-6563', initialLevel=14, destinationLevel=12, state=NOT_STARTED}, Passenger{id='pas-5658', initialLevel=18, destinationLevel=12, state=NOT_STARTED}, Passenger{id='pas-2990', initialLevel=19, destinationLevel=17, state=NOT_STARTED}]
+17:57:28.416 INFO   - ------ VALIDATION PROCESS ------
+17:57:28.416 INFO   - Level 0 dispatch is empty - true
+17:57:28.416 INFO   - Level 1 dispatch is empty - true
+17:57:28.416 INFO   - Level 2 dispatch is empty - true
+17:57:28.416 INFO   - Passenger #pas-3315 with destination 2 is in level 2 arrival
+17:57:28.416 INFO   - Passenger #pas-3315 state COMPLETED
+17:57:28.416 INFO   - Level 3 dispatch is empty - true
+17:57:28.416 INFO   - Level 4 dispatch is empty - false
